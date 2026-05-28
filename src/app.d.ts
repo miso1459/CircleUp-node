@@ -5,8 +5,8 @@ import type { User, Session } from 'better-auth/minimal';
 declare global {
 	namespace App {
 		interface Locals {
-			user?: User;
-			session?: Session;
+			user: (User & { role: string; lang: string }) | null;
+			session: Session | null;
 		}
 
 		// interface Error {}

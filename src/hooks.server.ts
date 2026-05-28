@@ -3,8 +3,10 @@ import { building } from '$app/environment';
 import { auth } from '$lib/server/auth';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
 import type { Handle } from '@sveltejs/kit';
+import type { User } from 'better-auth';
 import { getTextDirection } from '$lib/paraglide/runtime';
 import { paraglideMiddleware } from '$lib/paraglide/server';
+import { getUserById } from '$lib/server/services/user.service';
 
 const handleParaglide: Handle = ({ event, resolve }) =>
 	paraglideMiddleware(event.request, ({ request, locale }) => {
@@ -23,10 +25,34 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 
 	if (session) {
 		event.locals.session = session.session;
-		event.locals.user = session.user;
+		event.locals.user = session.user as User & { role: string; lang: string };
+	} else {
+		event.locals.user = null;
+		event.locals.session = null;
 	}
 
 	return svelteKitHandler({ event, resolve, auth, building });
 };
 
-export const handle: Handle = sequence(handleParaglide, handleBetterAuth);
+/**
+ * Sync the user's DB lang preference to the Paraglide locale cookie
+ * so that logged-in users always see the site in their preferred language.
+ */
+const handleLangSync: Handle = async ({ event, resolve }) => {
+	if (event.locals.user) {
+		const dbUser = await getUserById(event.locals.user.id);
+		if (dbUser?.lang) {
+			const newHeaders = new Headers(event.request.headers);
+			const existingCookie = event.request.headers.get('cookie') || '';
+			const cookies = existingCookie
+				.split('; ')
+				.filter((c) => !c.startsWith('PARAGLIDE_LOCALE='));
+			cookies.unshift(`PARAGLIDE_LOCALE=${dbUser.lang}`);
+			newHeaders.set('cookie', cookies.join('; '));
+			event.request = new Request(event.request, { headers: newHeaders });
+		}
+	}
+	return resolve(event);
+};
+
+export const handle: Handle = sequence(handleBetterAuth, handleLangSync, handleParaglide);
