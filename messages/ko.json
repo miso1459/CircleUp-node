@@ -1,4 +1,59 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"hello_world": "Hello, {name} from ko!"
+	"hello_world": "Hello, {name} from ko!",
+
+	"nav_home": "홈",
+	"nav_login": "로그인",
+	"nav_logout": "로그아웃",
+	"nav_profile": "프로필",
+	"nav_menu_management": "메뉴 관리",
+
+	"auth_sign_in": "로그인",
+	"auth_sign_up": "회원가입",
+	"auth_sign_out": "로그아웃",
+	"auth_social_github": "GitHub로 로그인",
+	"auth_social_google": "Google로 로그인",
+	"auth_social_naver": "Naver로 로그인",
+	"auth_social_apple": "Apple로 로그인",
+	"auth_social_instagram": "Instagram으로 로그인",
+	"auth_social_tiktok": "TikTok으로 로그인",
+	"auth_social_coming_soon": "준비 중입니다",
+
+	"profile_title": "프로필",
+	"profile_name": "이름",
+	"profile_lang": "언어",
+	"profile_save": "저장",
+	"profile_saved": "저장되었습니다",
+
+	"admin_title": "관리자",
+	"admin_users_title": "사용자 관리",
+	"admin_menus_title": "메뉴 관리",
+	"admin_dashboard": "대시보드",
+
+	"admin_users_email": "이메일",
+	"admin_users_role": "권한",
+	"admin_users_lang": "언어",
+	"admin_users_edit": "수정",
+	"admin_users_save": "변경사항 저장",
+
+	"admin_menus_add": "메뉴 추가",
+	"admin_menus_edit": "메뉴 수정",
+	"admin_menus_delete": "메뉴 삭제",
+	"admin_menus_type_folder": "폴더",
+	"admin_menus_type_link": "링크",
+	"admin_menus_path": "경로",
+	"admin_menus_ko_name": "이름 (한국어)",
+	"admin_menus_en_name": "이름 (영어)",
+	"admin_menus_role": "접근 권한",
+	"admin_menus_sort": "정렬 순서",
+	"admin_menus_is_active": "활성화",
+	"admin_menus_confirm_delete": "정말 삭제하시겠습니까?",
+
+	"common_save": "저장",
+	"common_cancel": "취소",
+	"common_delete": "삭제",
+	"common_edit": "수정",
+	"common_confirm": "확인",
+	"common_loading": "로딩 중...",
+	"common_error": "오류가 발생했습니다"
 }

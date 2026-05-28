@@ -11,6 +11,23 @@ export const auth = betterAuth({
 	database: drizzleAdapter(db, { provider: 'sqlite' }),
 	emailAndPassword: { enabled: true },
 
+	user: {
+		additionalFields: {
+			role: {
+				type: 'string',
+				required: true,
+				defaultValue: 'user',
+				input: true
+			},
+			lang: {
+				type: 'string',
+				required: true,
+				defaultValue: 'ko',
+				input: true
+			}
+		}
+	},
+
 	session: {
 		// 세션 만료 시간 (초 단위, 기본값: 7일)
 		// expiresIn: 60 * 60 * 24 * 7, // 7일
