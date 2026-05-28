@@ -5,7 +5,6 @@
 		DialogContent,
 		DialogHeader,
 		DialogTitle,
-		DialogTrigger,
 		DialogClose
 	} from '$lib/components/ui/dialog';
 	import {
@@ -25,6 +24,7 @@
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import type { MenuTreeNode } from '$lib/server/services/menu.service';
+	import { SvelteSet } from 'svelte/reactivity';
 
 	// -----------------------------------------------------------------------
 	// Props
@@ -42,7 +42,7 @@
 	// -----------------------------------------------------------------------
 	// UI State
 	// -----------------------------------------------------------------------
-	let expanded = $state(new Set<string>());
+	let expanded = new SvelteSet<string>();
 	let initialized = $state(false);
 
 	// Initialize expanded with all items (expand all by default).
@@ -50,27 +50,23 @@
 	$effect(() => {
 		const tree = data.menuTree;
 		if (!initialized && tree.length > 0) {
-			const s = new Set<string>();
 			function walk(list: MenuTreeNode[]) {
 				for (const node of list) {
-					s.add(node.id);
+					expanded.add(node.id);
 					walk(node.children);
 				}
 			}
 			walk(tree);
-			expanded = s;
 			initialized = true;
 		}
 	});
 
 	function toggleExpand(id: string) {
-		const next = new Set(expanded);
-		if (next.has(id)) {
-			next.delete(id);
+		if (expanded.has(id)) {
+			expanded.delete(id);
 		} else {
-			next.add(id);
+			expanded.add(id);
 		}
-		expanded = next;
 	}
 
 	// Flat tree for rendering (depth-based indentation)
