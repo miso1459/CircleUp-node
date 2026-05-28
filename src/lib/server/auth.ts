@@ -10,7 +10,23 @@ export const auth = betterAuth({
 	secret: env.BETTER_AUTH_SECRET,
 	database: drizzleAdapter(db, { provider: 'sqlite' }),
 	emailAndPassword: { enabled: true },
-	socialProviders: {
+
+	session: {
+		// 세션 만료 시간 (초 단위, 기본값: 7일)
+		// expiresIn: 60 * 60 * 24 * 7, // 7일
+		expiresIn: 60 * 60 // 1시간
+
+		// 마지막 활동 기준으로 세션 갱신 여부
+		// updateAge: 60 * 60 * 24, // 24시간마다 갱신
+
+		// 쿠키 캐시 설정 (DB 요청 최소화)
+		// cookieCache: {
+		// 	enabled: true,
+		// 	maxAge: 60 * 5, // 5분마다 DB 재검증
+		// },
+	},	
+
+  socialProviders: {
 		github: {
 			clientId: env.GITHUB_CLIENT_ID,
 			clientSecret: env.GITHUB_CLIENT_SECRET
