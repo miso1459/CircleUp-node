@@ -17,7 +17,7 @@ export const auth = betterAuth({
 				type: 'string',
 				required: true,
 				defaultValue: 'user',
-				input: true
+				input: false
 			},
 			lang: {
 				type: 'string',
