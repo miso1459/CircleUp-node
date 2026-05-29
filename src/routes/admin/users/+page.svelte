@@ -24,19 +24,17 @@
 		lang: string;
 	}
 
-	// Track only the edits (diffs from server data), initialized empty
+	// Track only the edits (diffs from server data), initialized from props
 	let edits = $state<Record<string, UserEdit>>({});
 
-	function getEdit(
-		userId: string,
-		defaultRole: string,
-		defaultLang: string
-	): UserEdit {
-		if (!edits[userId]) {
-			edits[userId] = { role: defaultRole, lang: defaultLang };
+	// Initialize edits in $effect – avoids state_unsafe_mutation from template mutation
+	$effect(() => {
+		const next: Record<string, UserEdit> = {};
+		for (const u of data.users) {
+			next[u.id] = { role: u.role, lang: u.lang };
 		}
-		return edits[userId];
-	}
+		edits = next;
+	});
 
 	const roleOptions = ['admin', 'user'];
 	const langOptions = ['ko', 'en'];
@@ -49,6 +47,7 @@
 		<TableHeader>
 			<TableRow>
 				<TableHead>{m.admin_users_email()}</TableHead>
+				<TableHead>{m.admin_users_name()}</TableHead>
 				<TableHead>{m.admin_users_role()}</TableHead>
 				<TableHead>{m.admin_users_lang()}</TableHead>
 				<TableHead class="w-32"></TableHead>
@@ -56,11 +55,12 @@
 		</TableHeader>
 		<TableBody>
 			{#each data.users as user (user.id)}
-				{@const edit = getEdit(user.id, user.role, user.lang)}
+				{@const edit = edits[user.id] ?? { role: user.role, lang: user.lang }}
 				<TableRow>
 					<TableCell class="font-medium">
 						{user.email}
 					</TableCell>
+					<TableCell>{user.name}</TableCell>
 					<TableCell>
 						<div class="flex items-center gap-2">
 							<Badge
@@ -108,6 +108,7 @@
 					<TableCell>
 						<form method="POST" action="?/updateUser">
 							<input type="hidden" name="userId" value={user.id} />
+							<input type="hidden" name="name" value={user.name} />
 							<input type="hidden" name="role" value={edit.role} />
 							<input type="hidden" name="lang" value={edit.lang} />
 							<Button type="submit" size="sm">
