@@ -3,7 +3,7 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { locales, localizeHref } from '$lib/paraglide/runtime';
-	import NavigationMenu from '$lib/components/NavigationMenu.svelte';
+	import NavigationMenu from '$lib/components/blocks/NavigationMenu.svelte';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { ModeWatcher } from "mode-watcher";	
