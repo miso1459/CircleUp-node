@@ -17,6 +17,9 @@ importers:
       lucide-svelte:
         specifier: ^1.0.1
         version: 1.0.1(svelte@5.55.10(@typescript-eslint/types@8.60.0))
+      mode-watcher:
+        specifier: ^1.1.0
+        version: 1.1.0(svelte@5.55.10(@typescript-eslint/types@8.60.0))
       tailwind-merge:
         specifier: ^3.6.0
         version: 3.6.0
@@ -126,9 +129,6 @@ importers:
       mdsvex:
         specifier: ^0.12.7
         version: 0.12.7(svelte@5.55.10(@typescript-eslint/types@8.60.0))
-      mode-watcher:
-        specifier: ^1.1.0
-        version: 1.1.0(svelte@5.55.10(@typescript-eslint/types@8.60.0))
       playwright:
         specifier: ^1.59.1
         version: 1.60.0

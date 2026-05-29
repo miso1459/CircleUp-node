@@ -5,5 +5,5 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 	const userRoles = locals.user ? [locals.user.role] : ['guest'];
 	const menus = await getMenusByRole(userRoles);
 
-	return { menus };
+	return { menus, user: locals.user ?? null };
 };

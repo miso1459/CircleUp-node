@@ -30,6 +30,7 @@
 	"admin_menus_title": "Menu Management",
 	"admin_dashboard": "Dashboard",
 
+	"admin_users_name": "Name",
 	"admin_users_email": "Email",
 	"admin_users_role": "Role",
 	"admin_users_lang": "Language",

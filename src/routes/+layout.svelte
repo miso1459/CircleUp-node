@@ -6,12 +6,14 @@
 	import NavigationMenu from '$lib/components/NavigationMenu.svelte';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
+	import { ModeWatcher } from "mode-watcher";	
 
 	let { children, data } = $props();
 </script>
 
+<ModeWatcher />
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
-<NavigationMenu items={data.menus} />
+<NavigationMenu items={data.menus} user={data.user} />
 {@render children()}
 
 <div style="display:none">

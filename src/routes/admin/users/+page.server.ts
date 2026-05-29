@@ -1,6 +1,7 @@
 import { requireRole } from '$lib/server/middleware/rbac';
 import {
 	getAllUsers,
+	updateUser,
 	updateUserRole,
 	updateUserLang
 } from '$lib/server/services/user.service';
@@ -16,9 +17,11 @@ export const actions: Actions = {
 	updateUser: async ({ request }) => {
 		const data = await request.formData();
 		const userId = data.get('userId') as string;
+		const name = data.get('name') as string;
 		const role = data.get('role') as string;
 		const lang = data.get('lang') as string;
 
+		if (userId && name) await updateUser(userId, { name });
 		if (userId && role) await updateUserRole(userId, role);
 		if (userId && lang) await updateUserLang(userId, lang);
 

@@ -1,21 +1,14 @@
 <script lang="ts">
 	import { createAuthClient } from 'better-auth/svelte';
-	import { env } from '$env/dynamic/public';
 	import * as m from '$lib/paraglide/messages';
 	import { toast } from 'svelte-sonner';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
-	import { Mail, Lock, LoaderCircle } from '@lucide/svelte';
 
-	const authClient = createAuthClient({ baseURL: env.PUBLIC_ORIGIN });
+	const authClient = createAuthClient();
 
-	let email = $state('');
-	let password = $state('');
 	let isLoading = $state(false);
-	let errorMessage = $state('');
 
 	type SocialProvider = {
 		id: string;
@@ -32,27 +25,8 @@
 		{ id: 'tiktok', label: m.auth_social_tiktok(), isDummy: true }
 	];
 
-	async function handleEmailSignIn(event: Event) {
-		event.preventDefault();
-		isLoading = true;
-		errorMessage = '';
-		try {
-			const { error } = await authClient.signIn.email({ email, password });
-			if (error) {
-				errorMessage = error.message || m.common_error();
-			} else {
-				window.location.href = '/';
-			}
-		} catch {
-			errorMessage = m.common_error();
-		} finally {
-			isLoading = false;
-		}
-	}
-
 	async function handleSocialSignIn(provider: string) {
 		isLoading = true;
-		errorMessage = '';
 		try {
 			const { data, error } = await authClient.signIn.social({
 				provider: provider as 'github' | 'google',
@@ -61,11 +35,11 @@
 			if (data?.url) {
 				window.location.href = data.url;
 			} else if (error) {
-				errorMessage = error.message || m.common_error();
+				toast.error(error.message || m.common_error());
 				isLoading = false;
 			}
 		} catch {
-			errorMessage = m.common_error();
+			toast.error(m.common_error());
 			isLoading = false;
 		}
 	}
@@ -90,57 +64,6 @@
 			<CardTitle class="text-center text-2xl">CircleUp</CardTitle>
 		</CardHeader>
 		<CardContent>
-			<form onsubmit={handleEmailSignIn}>
-				<div class="grid gap-4">
-					<div class="grid gap-2">
-						<Label for="email">Email</Label>
-						<div class="relative">
-							<Mail class="text-muted-foreground absolute left-2.5 top-1/2 size-4 -translate-y-1/2" />
-							<Input
-								id="email"
-								type="email"
-								placeholder="name@example.com"
-								class="pl-8"
-								bind:value={email}
-								required
-								disabled={isLoading}
-							/>
-						</div>
-					</div>
-					<div class="grid gap-2">
-						<Label for="password">Password</Label>
-						<div class="relative">
-							<Lock class="text-muted-foreground absolute left-2.5 top-1/2 size-4 -translate-y-1/2" />
-							<Input
-								id="password"
-								type="password"
-								placeholder="••••••••"
-								class="pl-8"
-								bind:value={password}
-								required
-								disabled={isLoading}
-							/>
-						</div>
-					</div>
-					{#if errorMessage}
-						<p class="text-destructive text-sm">{errorMessage}</p>
-					{/if}
-					<Button type="submit" class="w-full" disabled={isLoading}>
-						{#if isLoading}
-							<LoaderCircle class="size-4 animate-spin" />
-						{/if}
-						{m.auth_sign_in()}
-					</Button>
-				</div>
-			</form>
-			<div class="relative my-4">
-				<div class="absolute inset-0 flex items-center">
-					<span class="w-full border-t"></span>
-				</div>
-				<div class="relative flex justify-center text-xs uppercase">
-					<span class="bg-card text-muted-foreground px-2">Or continue with</span>
-				</div>
-			</div>
 			<div class="grid grid-cols-2 gap-2">
 				{#each socialProviders as provider (provider.id)}
 					<Button

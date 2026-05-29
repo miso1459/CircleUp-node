@@ -67,31 +67,20 @@ function getAdminEmails(): string[] {
 interface MenuSeed {
 	ko_name: string;
 	en_name: string;
-	type: 'link';
-	path: string;
+	type: 'folder' | 'link';
+	path: string | null;
 	role: string[];
 	sort_order: number;
+	parentId?: string;
 }
 
 const seedMenus: MenuSeed[] = [
 	{ ko_name: '홈', en_name: 'Home', type: 'link', path: '/', role: ['all'], sort_order: 0 },
 	{ ko_name: '로그인', en_name: 'Login', type: 'link', path: '/login', role: ['all'], sort_order: 1 },
-	{
-		ko_name: '로그아웃',
-		en_name: 'Logout',
-		type: 'link',
-		path: '/login',
-		role: ['user', 'admin'],
-		sort_order: 2
-	},
-	{
-		ko_name: '메뉴관리',
-		en_name: 'Menu Management',
-		type: 'link',
-		path: '/admin/menus',
-		role: ['admin'],
-		sort_order: 3
-	}
+	{ ko_name: '로그아웃', en_name: 'Logout', type: 'link', path: '/logout', role: ['user', 'admin'], sort_order: 2 },
+	{ ko_name: '설정', en_name: 'Settings', type: 'folder', path: null, role: ['admin'], sort_order: 3 },
+	{ ko_name: '메뉴관리', en_name: 'Menu Management', type: 'link', path: '/admin/menus', role: ['admin'], sort_order: 0, parentId: '설정' },
+	{ ko_name: '사용자 관리', en_name: 'User Management', type: 'link', path: '/admin/users', role: ['admin'], sort_order: 1, parentId: '설정' }
 ];
 
 // ---------------------------------------------------------------------------
@@ -115,6 +104,8 @@ function main(): void {
 	// 1. Seed menus (idempotent: skip if ko_name already exists)
 	// -----------------------------------------------------------------------
 	let menuCount = 0;
+	const createdIds: Record<string, string> = {};
+
 	for (const m of seedMenus) {
 		const existing = db
 			.select()
@@ -123,20 +114,27 @@ function main(): void {
 			.get();
 
 		if (existing) {
+			createdIds[m.ko_name] = existing.id;
 			console.log(`  ⏭️  Menu "${m.ko_name}" (${m.en_name}) already exists, skipping`);
 			continue;
 		}
 
-		db.insert(schema.menu)
+		const result = db.insert(schema.menu)
 			.values({
 				type: m.type,
-				path: m.path,
+				path: m.path ?? null,
 				ko_name: m.ko_name,
 				en_name: m.en_name,
 				role: JSON.stringify(m.role),
-				sort_order: m.sort_order
+				sort_order: m.sort_order,
+				parentId: m.parentId ? (createdIds[m.parentId] ?? null) : null
 			})
-			.run();
+			.returning({ id: schema.menu.id })
+			.get();
+
+		if (result) {
+			createdIds[m.ko_name] = result.id;
+		}
 
 		console.log(`  ✅ Created menu "${m.ko_name}" (${m.en_name})`);
 		menuCount++;

@@ -30,6 +30,7 @@
 	"admin_menus_title": "메뉴 관리",
 	"admin_dashboard": "대시보드",
 
+	"admin_users_name": "이름",
 	"admin_users_email": "이메일",
 	"admin_users_role": "권한",
 	"admin_users_lang": "언어",
