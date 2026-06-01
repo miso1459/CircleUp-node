@@ -177,33 +177,24 @@
 	// -----------------------------------------------------------------------
 	// Parent select: exclude self & descendants when editing
 	// -----------------------------------------------------------------------
-	function collectDescendantIds(items: MenuTreeNode[]): string[] {
-		const ids: string[] = [];
-		for (const node of items) {
-			ids.push(node.id);
-			ids.push(...collectDescendantIds(node.children));
-		}
-		return ids;
-	}
-
-	let excludedIds = $derived(
-		editItemId ? new Set(collectDescendantIds(data.menuTree)) : new Set<string>()
-	);
-
 	let parentOptions = $derived.by(() => {
 		const result: Array<{ id: string; label: string; depth: number }> = [];
-		function walk(items: MenuTreeNode[], depth: number) {
+
+		function walk(items: MenuTreeNode[], depth: number, skipChildren: boolean) {
 			for (const node of items) {
-				if (editMode && editItemId && excludedIds.has(node.id)) continue;
+				if (skipChildren) continue;
+
+				const isEditingNode = Boolean(editMode && editItemId && node.id === editItemId);
+
 				result.push({
 					id: node.id,
 					label: `${'　'.repeat(depth)}${node.ko_name}`,
 					depth
 				});
-				walk(node.children, depth + 1);
+				walk(node.children, depth + 1, isEditingNode);
 			}
 		}
-		walk(data.menuTree, 0);
+		walk(data.menuTree, 0, false);
 		return result;
 	});
 
@@ -580,10 +571,12 @@
 								: '없음 (최상위)'}
 						</SelectTrigger>
 						<SelectContent>
-							<SelectItem value="">없음 (최상위)</SelectItem>
-							{#each parentOptions as opt (opt.id)}
-								<SelectItem value={opt.id}>{opt.label}</SelectItem>
-							{/each}
+							{#key JSON.stringify(parentOptions.map(p => p.id))}
+								<SelectItem value="">없음 (최상위)</SelectItem>
+								{#each parentOptions as opt (opt.id)}
+									<SelectItem value={opt.id}>{opt.label}</SelectItem>
+								{/each}
+							{/key}
 						</SelectContent>
 					</Select>
 					<input type="hidden" name="parentId" value={formParentId} />
