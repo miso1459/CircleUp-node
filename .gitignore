@@ -36,3 +36,4 @@ graphify-out/
 .playwright-mcp/
 .omo
 tests
+login-page.png
