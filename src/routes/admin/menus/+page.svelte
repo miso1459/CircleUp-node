@@ -184,14 +184,21 @@
 			for (const node of items) {
 				if (skipChildren) continue;
 
-				const isEditingNode = Boolean(editMode && editItemId && node.id === editItemId);
+				const isSelf = Boolean(editMode && editItemId && node.id === editItemId);
+				if (isSelf) {
+					walk(node.children, depth + 1, true); // descendants skip
+					continue;
+				}
 
-				result.push({
-					id: node.id,
-					label: `${'　'.repeat(depth)}${node.ko_name}`,
-					depth
-				});
-				walk(node.children, depth + 1, isEditingNode);
+				// 상위 메뉴는 폴더만 선택 가능
+				if (node.type === 'folder') {
+					result.push({
+						id: node.id,
+						label: `${' '.repeat(depth)}${node.ko_name}`,
+						depth
+					});
+				}
+				walk(node.children, depth + 1, false);
 			}
 		}
 		walk(data.menuTree, 0, false);
@@ -203,7 +210,7 @@
 	// -----------------------------------------------------------------------
 	let draggedId = $state<string | null>(null);
 	let dropOverId = $state<string | null>(null);
-	let dropPosition = $state<'before' | 'after' | null>(null);
+	let dropPosition = $state<'before' | 'after' | 'inside' | null>(null);
 
 	function handleDragStart(e: DragEvent, itemId: string) {
 		draggedId = itemId;
@@ -212,7 +219,7 @@
 		}
 	}
 
-	function handleDragOver(e: DragEvent, itemId: string, pos: 'before' | 'after') {
+	function handleDragOver(e: DragEvent, itemId: string, pos: 'before' | 'after' | 'inside') {
 		e.preventDefault();
 		if (e.dataTransfer) {
 			e.dataTransfer.dropEffect = 'move';
@@ -241,6 +248,54 @@
 			return;
 		}
 
+		// --- inside drop: move as child of target folder ---
+		if (dropPosition === 'inside') {
+			// Prevent circular reference: check if target is a descendant of dragged
+			function isDescendant(parentId: string, childId: string): boolean {
+				const children = data.flatMenus.filter((m) => m.parentId === parentId);
+				for (const child of children) {
+					if (child.id === childId) return true;
+					if (isDescendant(child.id, childId)) return true;
+				}
+				return false;
+			}
+			if (isDescendant(draggedId, targetId)) {
+				draggedId = null;
+				dropOverId = null;
+				dropPosition = null;
+				return;
+			}
+
+			// Get existing children of target, sorted by sort_order
+			const targetChildren = data.flatMenus
+				.filter((m) => m.parentId === targetId)
+				.sort((a, b) => a.sort_order - b.sort_order);
+
+			// Build updates: existing children keep their order, dragged item goes last
+			const updates = targetChildren.map((item, i) => ({
+				id: item.id,
+				parentId: targetId,
+				sort_order: i
+			}));
+
+			updates.push({
+				id: draggedId,
+				parentId: targetId,
+				sort_order: targetChildren.length
+			});
+
+			const fd = new FormData();
+			fd.append('updates', JSON.stringify(updates));
+			await fetch('?/reorderMenu', { method: 'POST', body: fd });
+
+			draggedId = null;
+			dropOverId = null;
+			dropPosition = null;
+			window.location.reload();
+			return;
+		}
+
+		// --- before / after same-level reorder ---
 		// Get siblings (same parent level) sorted by sort_order
 		const siblings = data.flatMenus
 			.filter((m) => m.parentId === targetParentId)
@@ -294,7 +349,7 @@
 	// -----------------------------------------------------------------------
 	// CSS class helpers for DnD
 	// -----------------------------------------------------------------------
-	function dropClasses(itemId: string, pos: 'before' | 'after'): string {
+	function dropClasses(itemId: string, pos: 'before' | 'after' | 'inside'): string {
 		const base =
 			'pointer-events-none absolute left-0 right-0 z-10 h-1 rounded-full bg-primary transition-all';
 		if (dropOverId === itemId && dropPosition === pos) {
@@ -341,12 +396,15 @@
 		<div class="space-y-0.5">
 			{#each flatTree as { item, depth } (item.id)}
 				<div
-					class="group relative flex items-center gap-2 rounded-lg border p-2 transition-colors hover:bg-muted/50 {draggedId === item.id ? 'opacity-50' : ''}"
+					class="group relative flex items-center gap-2 rounded-lg border p-2 transition-colors hover:bg-muted/50 {draggedId === item.id ? 'opacity-50' : ''} {item.type === 'folder' && dropOverId === item.id && dropPosition === 'inside' ? 'bg-primary/10 border-primary/50' : ''}"
 					style="margin-left: {depth * 1.5}rem"
 					draggable={draggedId !== item.id}
 					role="listitem"
 					ondragstart={(e) => handleDragStart(e, item.id)}
 					ondragend={handleDragEnd}
+					ondragover={item.type === 'folder' ? (e) => handleDragOver(e, item.id, 'inside') : undefined}
+					ondrop={item.type === 'folder' ? (e) => handleDrop(e, item.id, item.parentId) : undefined}
+					ondragleave={item.type === 'folder' ? handleDragLeave : undefined}
 				>
 					<!-- Drop zone: before -->
 				<div
