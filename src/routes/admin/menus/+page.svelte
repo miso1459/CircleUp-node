@@ -31,6 +31,9 @@
 	// -----------------------------------------------------------------------
 	let { data } = $props();
 
+	// flatMenus는 Menu[] 타입 (children 없음)
+	type FlatMenu = (typeof data.flatMenus)[number];
+
 	// -----------------------------------------------------------------------
 	// Menu Tree type (flattened for rendering)
 	// -----------------------------------------------------------------------
@@ -208,6 +211,22 @@
 	let dropOverId = $state<string | null>(null);
 	let dropPosition = $state<'before' | 'after' | 'inside' | null>(null);
 
+	/**
+	 * ancestorId가 childId의 조상(또는 자기 자신)인지 확인.
+	 * - 드래그 아이템(ancestorId)의 하위로 타겟(childId)이 이동하는 것을 방지.
+	 */
+	function isAncestorOrSelf(ancestorId: string, childId: string): boolean {
+		if (ancestorId === childId) return true;
+		// childId 의 부모를 타고 올라가며 ancestorId 가 있는지 탐색
+		let current: string | null | undefined = childId;
+		while (current) {
+			const node = (data.flatMenus as FlatMenu[]).find((m) => m.id === current);
+			current = node?.parentId ?? null;
+			if (current === ancestorId) return true;
+		}
+		return false;
+	}
+
 	function handleDragStart(e: DragEvent, itemId: string) {
 		draggedId = itemId;
 		if (e.dataTransfer) {
@@ -216,9 +235,8 @@
 	}
 
 	/**
-	 * 마우스 Y 위치로 before / after / inside 자동 판단
-	 * - 폴더이고 중간 30~70% 구간이면 inside
-	 * - 그 외 상단 50% 미만이면 before, 이상이면 after
+	 * 마우스 Y 위치로 before / after / inside 자동 판단.
+	 * 드래그 아이템의 자손 위에 있을 때는 drop 표시를 하지 않음.
 	 */
 	function handleDragOver(e: DragEvent, itemId: string) {
 		e.preventDefault();
@@ -226,11 +244,18 @@
 			e.dataTransfer.dropEffect = 'move';
 		}
 
+		// 자기 자신 또는 자손 위에서는 drop 불가 표시
+		if (draggedId && isAncestorOrSelf(draggedId, itemId)) {
+			if (e.dataTransfer) e.dataTransfer.dropEffect = 'none';
+			dropOverId = null;
+			dropPosition = null;
+			return;
+		}
+
 		const el = e.currentTarget as HTMLElement;
 		const rect = el.getBoundingClientRect();
 		const ratio = (e.clientY - rect.top) / rect.height;
 
-		// flatTree에서 해당 아이템의 타입 조회
 		const targetFlatItem = flatTree.find((f) => f.item.id === itemId);
 		const isFolder = targetFlatItem?.item.type === 'folder';
 
@@ -258,11 +283,7 @@
 		}
 	}
 
-	/**
-	 * draggedId를 리셋하기 전에 캡처한 뒤 실제 drop 로직 처리
-	 */
 	async function handleDropWithSource(
-		e: DragEvent,
 		targetId: string,
 		targetParentId: string | null,
 		sourceDraggedId: string,
@@ -270,25 +291,22 @@
 	) {
 		if (sourceDraggedId === targetId) return;
 
+		// ── 공통 순환 참조 방지 ──────────────────────────────────────────────
+		// inside: 타겟이 소스의 자손이면 이동 불가
+		// before/after: 타겟의 부모(targetParentId)가 소스의 자손이면 이동 불가
+		const circularCheckTarget =
+			currentDropPosition === 'inside' ? targetId : (targetParentId ?? '');
+		if (circularCheckTarget && isAncestorOrSelf(sourceDraggedId, circularCheckTarget)) return;
+
 		// ── inside drop: 폴더 안으로 이동 ──────────────────────────────────
 		if (currentDropPosition === 'inside') {
-			function isDescendant(parentId: string, childId: string): boolean {
-				const children = data.flatMenus.filter((m: MenuTreeNode) => m.parentId === parentId);
-				for (const child of children) {
-					if (child.id === childId) return true;
-					if (isDescendant(child.id, childId)) return true;
-				}
-				return false;
-			}
-			if (isDescendant(sourceDraggedId, targetId)) return;
-
-			const targetChildren = data.flatMenus
-				.filter((m: MenuTreeNode) => m.parentId === targetId)
-				.sort((a: MenuTreeNode, b: MenuTreeNode) => a.sort_order - b.sort_order);
+			const targetChildren = (data.flatMenus as FlatMenu[])
+				.filter((m) => m.parentId === targetId)
+				.sort((a, b) => a.sort_order - b.sort_order);
 
 			const updates = targetChildren
-				.filter((item: MenuTreeNode) => item.id !== sourceDraggedId)
-				.map((item: MenuTreeNode, i: number) => ({
+				.filter((item) => item.id !== sourceDraggedId)
+				.map((item, i) => ({
 					id: item.id,
 					parentId: targetId,
 					sort_order: i
@@ -308,39 +326,29 @@
 		}
 
 		// ── before / after: 같은 레벨 순서 변경 ───────────────────────────
-		// 드래그된 아이템의 현재 parentId 조회
-		const draggedFlatItem = flatTree.find((f) => f.item.id === sourceDraggedId);
-		const draggedParentId = draggedFlatItem?.item.parentId ?? null;
+		const siblings = (data.flatMenus as FlatMenu[])
+			.filter((m) => (m.parentId ?? null) === (targetParentId ?? null))
+			.sort((a, b) => a.sort_order - b.sort_order);
 
-		// 같은 부모 레벨의 형제들
-		const siblings = data.flatMenus
-			.filter((m: MenuTreeNode) => (m.parentId ?? null) === (targetParentId ?? null))
-			.sort((a: MenuTreeNode, b: MenuTreeNode) => a.sort_order - b.sort_order);
-
-		const draggedIdx = siblings.findIndex((m: MenuTreeNode) => m.id === sourceDraggedId);
-		const targetIdx = siblings.findIndex((m: MenuTreeNode) => m.id === targetId);
+		const draggedIdx = siblings.findIndex((m) => m.id === sourceDraggedId);
+		const targetIdx = siblings.findIndex((m) => m.id === targetId);
 
 		// 드래그 아이템이 형제 목록에 없으면 (다른 부모에서 온 경우) → 크로스 레벨 이동
 		if (draggedIdx < 0) {
-			// 드래그 아이템을 target 레벨(targetParentId)로 이동시키고 위치 조정
-			const reordered = [...siblings];
 			const insertAt = currentDropPosition === 'before' ? targetIdx : targetIdx + 1;
 
-			// 기존 형제들의 새 순서
-			const updates = reordered.map((item, i) => ({
+			const updates = siblings.map((item, i) => ({
 				id: item.id,
 				parentId: targetParentId,
 				sort_order: i >= insertAt ? i + 1 : i
 			}));
 
-			// 드래그 아이템 삽입
 			updates.push({
 				id: sourceDraggedId,
 				parentId: targetParentId,
 				sort_order: insertAt
 			});
 
-			// sort_order 재정렬 (0, 1, 2, ... 연속하게)
 			updates.sort((a, b) => a.sort_order - b.sort_order);
 			const normalizedUpdates = updates.map((item, i) => ({ ...item, sort_order: i }));
 
@@ -352,7 +360,7 @@
 		}
 
 		// 같은 부모 내 순서 변경
-		const reordered = siblings.filter((m: MenuTreeNode) => m.id !== sourceDraggedId);
+		const reordered = siblings.filter((m) => m.id !== sourceDraggedId);
 		const draggedItem = siblings[draggedIdx];
 		let insertAt = targetIdx;
 		if (draggedIdx < targetIdx) {
@@ -382,7 +390,7 @@
 	}
 
 	// -----------------------------------------------------------------------
-	// 통합 drag 이벤트 핸들러 (draggedId를 리셋 전에 캡처)
+	// 통합 drop 핸들러: draggedId를 리셋 전에 캡처
 	// -----------------------------------------------------------------------
 	async function onDrop(e: DragEvent, targetId: string, targetParentId: string | null) {
 		e.preventDefault();
@@ -400,7 +408,7 @@
 		dropOverId = null;
 		dropPosition = null;
 
-		await handleDropWithSource(e, targetId, targetParentId, sourceDraggedId, currentDropPosition);
+		await handleDropWithSource(targetId, targetParentId, sourceDraggedId, currentDropPosition);
 	}
 
 	// -----------------------------------------------------------------------
@@ -421,7 +429,7 @@
 		}
 	}
 
-	// 드롭 인디케이터 클래스
+	// 드롭 인디케이터 row 클래스
 	function rowClasses(itemId: string, type: 'folder' | 'link'): string {
 		const base =
 			'group relative flex items-center gap-2 rounded-lg border p-2 transition-colors hover:bg-muted/50';
@@ -455,8 +463,8 @@
 				<!-- ── 드롭 인디케이터: before ── -->
 				{#if dropOverId === item.id && dropPosition === 'before'}
 					<div
-						class="pointer-events-none mx-2 h-0.5 rounded-full bg-primary"
-						style="margin-left: calc({depth * 1.5}rem + 0.5rem)"
+						class="pointer-events-none h-0.5 rounded-full bg-primary"
+						style="margin-left: calc({depth * 1.5}rem + 0.5rem); margin-right: 0.5rem"
 					></div>
 				{/if}
 
@@ -555,8 +563,8 @@
 				<!-- ── 드롭 인디케이터: after ── -->
 				{#if dropOverId === item.id && dropPosition === 'after'}
 					<div
-						class="pointer-events-none mx-2 h-0.5 rounded-full bg-primary"
-						style="margin-left: calc({depth * 1.5}rem + 0.5rem)"
+						class="pointer-events-none h-0.5 rounded-full bg-primary"
+						style="margin-left: calc({depth * 1.5}rem + 0.5rem); margin-right: 0.5rem"
 					></div>
 				{/if}
 			{/each}
