@@ -286,12 +286,15 @@
 
 			const fd = new FormData();
 			fd.append('updates', JSON.stringify(updates));
-			await fetch('?/reorderMenu', { method: 'POST', body: fd });
+			const response = await fetch('?/reorderMenu', { method: 'POST', body: fd });
 
 			draggedId = null;
 			dropOverId = null;
 			dropPosition = null;
-			window.location.reload();
+
+			if (response.ok) {
+				window.location.reload();
+			}
 			return;
 		}
 
@@ -330,14 +333,16 @@
 		// Submit reorder via fetch
 		const fd = new FormData();
 		fd.append('updates', JSON.stringify(updates));
-		await fetch('?/reorderMenu', { method: 'POST', body: fd });
+		const response = await fetch('?/reorderMenu', { method: 'POST', body: fd });
 
 		draggedId = null;
 		dropOverId = null;
 		dropPosition = null;
 
 		// Reload to reflect changes
-		window.location.reload();
+		if (response.ok) {
+			window.location.reload();
+		}
 	}
 
 	function handleDragEnd() {

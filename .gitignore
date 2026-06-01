@@ -34,3 +34,5 @@ storybook-static
 .sisyphus/
 graphify-out/
 .playwright-mcp/
+.omo
+tests
