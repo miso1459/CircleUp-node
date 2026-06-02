@@ -7,6 +7,7 @@ declare global {
 		interface Locals {
 			user: (User & { role: string; lang: string }) | null;
 			session: Session | null;
+			isFreshLogin: boolean;
 		}
 
 		// interface Error {}

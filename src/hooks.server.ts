@@ -26,36 +26,39 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 	if (session) {
 		event.locals.session = session.session;
 		event.locals.user = session.user as User & { role: string; lang: string };
+
+		// Detect fresh login: session created within last 30 seconds
+		const createdAt = session.session.createdAt instanceof Date
+			? session.session.createdAt.getTime()
+			: new Date(session.session.createdAt).getTime();
+		event.locals.isFreshLogin = (Date.now() - createdAt) < 30_000;
 	} else {
 		event.locals.user = null;
 		event.locals.session = null;
+		event.locals.isFreshLogin = false;
 	}
 
 	return svelteKitHandler({ event, resolve, auth, building });
 };
 
 /**
- * Sync the user's DB lang preference to the Paraglide locale cookie
- * ONLY on first login (when no PARAGLIDE_LOCALE cookie exists).
- * User-initiated language changes via UI are preserved and NOT overwritten.
+ * Sync the user's DB lang preference to the Paraglide locale cookie.
+ *
+ * - Fresh login: ALWAYS override cookie from DB (user's profile language takes priority).
+ * - Existing session: respect existing cookie (user's manual nav switch is preserved).
  */
 const handleLangSync: Handle = async ({ event, resolve }) => {
-	if (event.locals.user) {
-		const existingCookie = event.request.headers.get('cookie') || '';
-		const hasLocaleCookie = existingCookie.includes('PARAGLIDE_LOCALE=');
-
-		// Only set cookie from DB if user doesn't already have one
-		if (!hasLocaleCookie) {
-			const dbUser = await getUserById(event.locals.user.id);
-			if (dbUser?.lang) {
-				const newHeaders = new Headers(event.request.headers);
-				const cookies = existingCookie
-					.split('; ')
-					.filter((c) => !c.startsWith('PARAGLIDE_LOCALE='));
-				cookies.unshift(`PARAGLIDE_LOCALE=${dbUser.lang}`);
-				newHeaders.set('cookie', cookies.join('; '));
-				event.request = new Request(event.request, { headers: newHeaders });
-			}
+	if (event.locals.user && event.locals.isFreshLogin) {
+		const dbUser = await getUserById(event.locals.user.id);
+		if (dbUser?.lang) {
+			const newHeaders = new Headers(event.request.headers);
+			const existingCookie = event.request.headers.get('cookie') || '';
+			const cookies = existingCookie
+				.split('; ')
+				.filter((c) => !c.startsWith('PARAGLIDE_LOCALE='));
+			cookies.unshift(`PARAGLIDE_LOCALE=${dbUser.lang}`);
+			newHeaders.set('cookie', cookies.join('; '));
+			event.request = new Request(event.request, { headers: newHeaders });
 		}
 	}
 	return resolve(event);
