@@ -48,6 +48,8 @@
 	"admin_menus_en_name": "Name (English)",
 	"admin_menus_role": "Access Role",
 	"admin_menus_sort": "Sort Order",
+	"admin_menus_parent": "Parent Menu",
+	"admin_menus_no_parent": "None (Top level)",
 	"admin_menus_is_active": "Active",
 	"admin_menus_confirm_delete": "Are you sure you want to delete this?",
 

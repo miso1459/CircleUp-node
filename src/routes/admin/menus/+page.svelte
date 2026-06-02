@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages';
+	import { getLocale } from '$lib/paraglide/runtime';
 	import {
 		Dialog,
 		DialogContent,
@@ -177,6 +178,8 @@
 	// -----------------------------------------------------------------------
 	// Parent select: exclude self & descendants when editing
 	// -----------------------------------------------------------------------
+	const currentLocale = $derived(getLocale());
+
 	let parentOptions = $derived.by(() => {
 		const result: Array<{ id: string; label: string; depth: number }> = [];
 
@@ -191,9 +194,10 @@
 				}
 
 				if (node.type === 'folder') {
+					const name = currentLocale === 'en' ? node.en_name : node.ko_name;
 					result.push({
 						id: node.id,
-						label: `${' '.repeat(depth)}${node.ko_name}`,
+						label: `${'─'.repeat(depth)} ${name}`,
 						depth
 					});
 				}
@@ -687,7 +691,7 @@
 
 				<!-- parentId -->
 				<div class="space-y-1.5">
-					<Label for="parent_id">상위 메뉴</Label>
+					<Label for="parent_id">{m.admin_menus_parent()}</Label>
 					<Select
 						type="single"
 						value={formParentId}
@@ -698,11 +702,11 @@
 						<SelectTrigger id="parent_id" class="w-full">
 							{formParentId
 								? (parentOptions.find((p) => p.id === formParentId)?.label ?? formParentId)
-								: '없음 (최상위)'}
+								: m.admin_menus_no_parent()}
 						</SelectTrigger>
 						<SelectContent>
 							{#key JSON.stringify(parentOptions.map((p) => p.id))}
-								<SelectItem value="">없음 (최상위)</SelectItem>
+								<SelectItem value="">{m.admin_menus_no_parent()}</SelectItem>
 								{#each parentOptions as opt (opt.id)}
 									<SelectItem value={opt.id}>{opt.label}</SelectItem>
 								{/each}

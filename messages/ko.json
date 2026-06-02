@@ -48,6 +48,8 @@
 	"admin_menus_en_name": "이름 (영어)",
 	"admin_menus_role": "접근 권한",
 	"admin_menus_sort": "정렬 순서",
+	"admin_menus_parent": "상위 메뉴",
+	"admin_menus_no_parent": "없음 (최상위)",
 	"admin_menus_is_active": "활성화",
 	"admin_menus_confirm_delete": "정말 삭제하시겠습니까?",
 
