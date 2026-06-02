@@ -432,7 +432,7 @@
 	// 드롭 인디케이터 row 클래스
 	function rowClasses(itemId: string, type: 'folder' | 'link'): string {
 		const base =
-			'group relative flex items-center gap-2 rounded-lg border p-2 transition-colors hover:bg-muted/50';
+			'group relative flex items-center gap-2 rounded-xl border border-border/50 p-2.5 transition-all duration-200 hover:bg-muted/60 hover:shadow-sm';
 		const isDragging = draggedId === itemId ? ' opacity-50' : '';
 		const isDropInside =
 			type === 'folder' && dropOverId === itemId && dropPosition === 'inside'
@@ -445,8 +445,11 @@
 <div class="space-y-6">
 	<!-- Header -->
 	<div class="flex items-center justify-between">
-		<h2 class="text-2xl font-semibold">{m.admin_menus_title()}</h2>
-		<Button onclick={() => openAddDialog()}>
+		<div>
+			<h2 class="text-3xl font-bold tracking-tight">{m.admin_menus_title()}</h2>
+			<p class="mt-1 text-sm text-muted-foreground">Organize and manage your navigation structure</p>
+		</div>
+		<Button onclick={() => openAddDialog()} class="gap-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
 			<Plus class="size-4" />
 			{m.admin_menus_add()}
 		</Button>
@@ -454,11 +457,13 @@
 
 	<!-- Menu Tree -->
 	{#if flatTree.length === 0}
-		<p class="text-muted-foreground py-8 text-center">
-			{m.admin_menus_add()}...
-		</p>
+		<div class="rounded-2xl border border-border/50 bg-card py-16 text-center">
+			<p class="text-muted-foreground">
+				{m.admin_menus_add()}...
+			</p>
+		</div>
 	{:else}
-		<div class="space-y-0.5">
+		<div class="space-y-1 rounded-2xl border border-border/50 bg-card p-2">
 			{#each flatTree as { item, depth } (item.id)}
 				<!-- ── 드롭 인디케이터: before ── -->
 				{#if dropOverId === item.id && dropPosition === 'before'}
@@ -514,14 +519,14 @@
 					</span>
 
 					<!-- Type badge -->
-					<Badge variant={typeBadgeVariant(item.type)}>
+					<Badge variant={typeBadgeVariant(item.type)} class="rounded-md">
 						{item.type === 'folder' ? m.admin_menus_type_folder() : m.admin_menus_type_link()}
 					</Badge>
 
 					<!-- Role badges -->
 					<div class="hidden items-center gap-1 sm:flex" role="none">
 						{#each item.role as role (role)}
-							<Badge variant={roleBadgeVariant(role)} class="text-xs">
+							<Badge variant={roleBadgeVariant(role)} class="rounded-md text-xs">
 								{role}
 							</Badge>
 						{/each}
@@ -575,7 +580,7 @@
 	     Add / Edit Dialog
 	     ======================================================================== -->
 	<Dialog bind:open={dialogOpen}>
-		<DialogContent>
+		<DialogContent class="rounded-2xl">
 			<DialogHeader>
 				<DialogTitle>
 					{editMode ? m.admin_menus_edit() : m.admin_menus_add()}
@@ -585,7 +590,7 @@
 			<form
 				method="POST"
 				action={editMode ? '?/updateMenu' : '?/createMenu'}
-				class="space-y-4"
+				class="space-y-5"
 			>
 				{#if editMode && editItemId}
 					<input type="hidden" name="id" value={editItemId} />
@@ -725,11 +730,11 @@
 				{/if}
 
 				<!-- Submit -->
-				<div class="flex justify-end gap-2 pt-2">
+				<div class="flex justify-end gap-2 pt-3">
 					<DialogClose>
 						<Button variant="outline" type="button">{m.common_cancel()}</Button>
 					</DialogClose>
-					<Button type="submit">{m.common_save()}</Button>
+					<Button type="submit" class="transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">{m.common_save()}</Button>
 				</div>
 			</form>
 		</DialogContent>
@@ -739,13 +744,13 @@
 	     Delete Confirmation Dialog
 	     ======================================================================== -->
 	<Dialog bind:open={deleteDialogOpen}>
-		<DialogContent>
+		<DialogContent class="rounded-2xl">
 			<DialogHeader>
 				<DialogTitle>{m.admin_menus_delete()}</DialogTitle>
 			</DialogHeader>
 
-			<p class="text-sm">{m.admin_menus_confirm_delete()}</p>
-			<p class="font-medium">{deleteItemName}</p>
+			<p class="text-sm text-muted-foreground">{m.admin_menus_confirm_delete()}</p>
+			<p class="font-medium text-foreground">{deleteItemName}</p>
 
 			<form method="POST" action="?/deleteMenu" class="flex justify-end gap-2 pt-2">
 				<input type="hidden" name="id" value={deleteItemId ?? ''} />

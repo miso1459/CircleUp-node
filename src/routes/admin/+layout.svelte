@@ -4,9 +4,10 @@
 	let { children } = $props();
 </script>
 
-<div class="mx-auto max-w-7xl p-6">
-	<header class="mb-8">
-		<h1 class="text-3xl font-bold">{m.admin_title()}</h1>
+<div>
+	<header class="mb-8 border-b border-border/30 pb-6">
+		<h1 class="text-3xl font-bold tracking-tight">{m.admin_title()}</h1>
+		<p class="mt-1 text-sm text-muted-foreground">System administration panel</p>
 	</header>
 	{@render children()}
 </div>

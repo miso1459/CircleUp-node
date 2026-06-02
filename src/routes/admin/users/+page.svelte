@@ -41,83 +41,88 @@
 </script>
 
 <div class="space-y-6">
-	<h2 class="text-2xl font-semibold">{m.admin_users_title()}</h2>
+	<div>
+		<h2 class="text-3xl font-bold tracking-tight">{m.admin_users_title()}</h2>
+		<p class="mt-1 text-sm text-muted-foreground">Manage user roles and language preferences</p>
+	</div>
 
-	<Table>
-		<TableHeader>
-			<TableRow>
-				<TableHead>{m.admin_users_email()}</TableHead>
-				<TableHead>{m.admin_users_name()}</TableHead>
-				<TableHead>{m.admin_users_role()}</TableHead>
-				<TableHead>{m.admin_users_lang()}</TableHead>
-				<TableHead class="w-32"></TableHead>
-			</TableRow>
-		</TableHeader>
-		<TableBody>
-			{#each data.users as user (user.id)}
-				{@const edit = edits[user.id] ?? { role: user.role, lang: user.lang }}
-				<TableRow>
-					<TableCell class="font-medium">
-						{user.email}
-					</TableCell>
-					<TableCell>{user.name}</TableCell>
-					<TableCell>
-						<div class="flex items-center gap-2">
-							<Badge
-								variant={user.role === 'admin' ? 'default' : 'secondary'}
-								class="hidden sm:inline-flex"
-							>
-								{user.role}
-							</Badge>
+	<div class="rounded-2xl border border-border/50 bg-card overflow-hidden">
+		<Table>
+			<TableHeader>
+				<TableRow class="bg-muted/50 hover:bg-muted/50">
+					<TableHead class="font-medium">{m.admin_users_email()}</TableHead>
+					<TableHead class="font-medium">{m.admin_users_name()}</TableHead>
+					<TableHead class="font-medium">{m.admin_users_role()}</TableHead>
+					<TableHead class="font-medium">{m.admin_users_lang()}</TableHead>
+					<TableHead class="w-32"></TableHead>
+				</TableRow>
+			</TableHeader>
+			<TableBody>
+				{#each data.users as user (user.id)}
+					{@const edit = edits[user.id] ?? { role: user.role, lang: user.lang }}
+					<TableRow class="transition-colors hover:bg-muted/40">
+						<TableCell class="font-medium">
+							{user.email}
+						</TableCell>
+						<TableCell>{user.name}</TableCell>
+						<TableCell>
+							<div class="flex items-center gap-2">
+								<Badge
+									variant={user.role === 'admin' ? 'default' : 'secondary'}
+									class="hidden rounded-md sm:inline-flex"
+								>
+									{user.role}
+								</Badge>
+								<Select
+									type="single"
+									value={edit.role}
+									onValueChange={(v: string) => {
+										edit.role = v;
+									}}
+								>
+									<SelectTrigger class="w-28">
+										{edit.role}
+									</SelectTrigger>
+									<SelectContent>
+										{#each roleOptions as role (role)}
+											<SelectItem value={role}>{role}</SelectItem>
+										{/each}
+									</SelectContent>
+								</Select>
+							</div>
+						</TableCell>
+						<TableCell>
 							<Select
 								type="single"
-								value={edit.role}
+								value={edit.lang}
 								onValueChange={(v: string) => {
-									edit.role = v;
+									edit.lang = v;
 								}}
 							>
-								<SelectTrigger class="w-28">
-									{edit.role}
+								<SelectTrigger class="w-20">
+									{edit.lang}
 								</SelectTrigger>
 								<SelectContent>
-									{#each roleOptions as role (role)}
-										<SelectItem value={role}>{role}</SelectItem>
+									{#each langOptions as lang (lang)}
+										<SelectItem value={lang}>{lang}</SelectItem>
 									{/each}
 								</SelectContent>
 							</Select>
-						</div>
-					</TableCell>
-					<TableCell>
-						<Select
-							type="single"
-							value={edit.lang}
-							onValueChange={(v: string) => {
-								edit.lang = v;
-							}}
-						>
-							<SelectTrigger class="w-20">
-								{edit.lang}
-							</SelectTrigger>
-							<SelectContent>
-								{#each langOptions as lang (lang)}
-									<SelectItem value={lang}>{lang}</SelectItem>
-								{/each}
-							</SelectContent>
-						</Select>
-					</TableCell>
-					<TableCell>
-						<form method="POST" action="?/updateUser">
-							<input type="hidden" name="userId" value={user.id} />
-							<input type="hidden" name="name" value={user.name} />
-							<input type="hidden" name="role" value={edit.role} />
-							<input type="hidden" name="lang" value={edit.lang} />
-							<Button type="submit" size="sm">
-								{m.admin_users_save()}
-							</Button>
-						</form>
-					</TableCell>
-				</TableRow>
-			{/each}
-		</TableBody>
-	</Table>
+						</TableCell>
+						<TableCell>
+							<form method="POST" action="?/updateUser">
+								<input type="hidden" name="userId" value={user.id} />
+								<input type="hidden" name="name" value={user.name} />
+								<input type="hidden" name="role" value={edit.role} />
+								<input type="hidden" name="lang" value={edit.lang} />
+								<Button type="submit" class="transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+									{m.admin_users_save()}
+								</Button>
+							</form>
+						</TableCell>
+					</TableRow>
+				{/each}
+			</TableBody>
+		</Table>
+	</div>
 </div>

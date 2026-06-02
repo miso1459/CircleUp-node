@@ -30,12 +30,21 @@
 </script>
 
 <Toaster />
-<div class="flex min-h-screen items-center justify-center p-4">
-	<Card class="w-full max-w-md">
-		<CardHeader>
-			<CardTitle>{m.profile_title()}</CardTitle>
+<div class="relative flex min-h-[80dvh] items-center justify-center p-4">
+	<!-- Background gradient orbs -->
+	<div class="pointer-events-none absolute inset-0 overflow-hidden">
+		<div class="absolute -left-32 -top-32 size-96 rounded-full bg-primary/5 blur-3xl"></div>
+		<div class="absolute -bottom-32 -right-32 size-96 rounded-full bg-primary/8 blur-3xl"></div>
+	</div>
+
+	<Card class="relative w-full max-w-md rounded-2xl border-border/50 shadow-sm">
+		<CardHeader class="items-center gap-3 pb-2">
+			<div class="flex size-16 items-center justify-center rounded-2xl bg-primary/10 text-2xl font-bold text-primary">
+				{name?.charAt(0)?.toUpperCase() ?? '?'}
+			</div>
+			<CardTitle class="text-xl font-bold tracking-tight">{m.profile_title()}</CardTitle>
 		</CardHeader>
-		<CardContent>
+		<CardContent class="pt-4">
 			<form
 				method="POST"
 				action="?/updateProfile"
@@ -51,21 +60,22 @@
 					};
 				}}
 			>
-				<div class="grid gap-4">
+				<div class="grid gap-5">
 					<div class="grid gap-2">
-						<Label for="name">{m.profile_name()}</Label>
+						<Label for="name" class="text-sm font-medium">{m.profile_name()}</Label>
 						<Input
 							id="name"
 							name="name"
 							type="text"
 							bind:value={name}
 							required
+							class="h-11 rounded-lg"
 						/>
 					</div>
 					<div class="grid gap-2">
-						<Label for="lang">{m.profile_lang()}</Label>
+						<Label for="lang" class="text-sm font-medium">{m.profile_lang()}</Label>
 						<Select type="single" bind:value={lang}>
-							<SelectTrigger id="lang" class="w-full">
+							<SelectTrigger id="lang" class="h-11 w-full rounded-lg">
 								{lang === 'ko' ? '한국어' : 'English'}
 							</SelectTrigger>
 							<SelectContent>
@@ -75,7 +85,9 @@
 						</Select>
 						<input type="hidden" name="lang" value={lang} />
 					</div>
-					<Button type="submit">{m.profile_save()}</Button>
+					<Button type="submit" class="mt-2 h-11 w-full rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+						{m.profile_save()}
+					</Button>
 				</div>
 			</form>
 		</CardContent>

@@ -58,17 +58,34 @@
 </script>
 
 <Toaster />
-<div class="flex min-h-screen items-center justify-center bg-background p-4">
-	<Card class="w-full max-w-sm">
-		<CardHeader>
-			<CardTitle class="text-center text-2xl">CircleUp</CardTitle>
+<div class="relative flex min-h-screen items-center justify-center overflow-hidden p-4">
+	<!-- Background gradient orbs -->
+	<div class="pointer-events-none absolute inset-0 overflow-hidden">
+		<div class="absolute -left-32 -top-32 size-96 rounded-full bg-primary/5 blur-3xl"></div>
+		<div class="absolute -bottom-32 -right-32 size-96 rounded-full bg-primary/8 blur-3xl"></div>
+		<div class="absolute left-1/2 top-1/2 size-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/10 blur-3xl"></div>
+	</div>
+
+	<Card class="relative w-full max-w-sm rounded-2xl border-border/50 shadow-lg">
+		<CardHeader class="items-center gap-3 pb-2">
+			<div class="flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+					<circle cx="12" cy="12" r="10" />
+					<path d="M8 12h8" />
+					<path d="M12 8v8" />
+				</svg>
+			</div>
+			<div class="text-center">
+				<CardTitle class="text-2xl font-bold tracking-tight">CircleUp</CardTitle>
+				<p class="mt-1 text-sm text-muted-foreground">Sign in to your account</p>
+			</div>
 		</CardHeader>
-		<CardContent>
-			<div class="grid grid-cols-2 gap-2">
+		<CardContent class="pt-4">
+			<div class="grid grid-cols-2 gap-3">
 				{#each socialProviders as provider (provider.id)}
 					<Button
 						variant="outline"
-						class="w-full"
+						class="h-11 w-full gap-2.5 border-border/60 transition-all duration-200 hover:bg-muted/80 hover:shadow-sm active:scale-[0.98]"
 						disabled={isLoading}
 						onclick={() => onSocialClick(provider)}
 					>
