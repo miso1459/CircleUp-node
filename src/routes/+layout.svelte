@@ -1,8 +1,5 @@
 <script lang="ts">
-	import type { Pathname } from '$app/types';
-	import { resolve } from '$app/paths';
-	import { page } from '$app/state';
-	import { locales, localizeHref, getLocale } from '$lib/paraglide/runtime';
+	import { locales, getLocale, setLocale } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 	import NavigationMenu from '$lib/components/blocks/NavigationMenu.svelte';
 	import './layout.css';
@@ -28,6 +25,24 @@
 		ko: '한국어',
 		en: 'English'
 	};
+
+	async function switchLanguage(locale: string) {
+		// If logged in, update user's lang in DB first
+		if (data.user) {
+			try {
+				const res = await fetch('/api/update-lang', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ lang: locale })
+				});
+				if (!res.ok) return;
+			} catch {
+				return;
+			}
+		}
+		// Set locale cookie and reload page
+		setLocale(locale as 'ko' | 'en');
+	}
 </script>
 
 <ModeWatcher />
@@ -79,9 +94,10 @@
 							<span>{m.dropdown_language()}</span>
 						</div>
 						{#each locales as locale (locale)}
-							<a
-								href={resolve(localizeHref(page.url.pathname, { locale }) as Pathname)}
+							<button
+								type="button"
 								class="flex w-full cursor-pointer items-center rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted {locale === currentLocale ? 'font-medium text-foreground' : 'text-muted-foreground'}"
+								onclick={() => switchLanguage(locale)}
 							>
 								{#if locale === currentLocale}
 									<svg class="mr-2 size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -89,7 +105,7 @@
 									</svg>
 								{/if}
 								<span>{localeLabels[locale] ?? locale}</span>
-							</a>
+							</button>
 						{/each}
 					</div>
 					<DropdownMenuSeparator />
@@ -116,9 +132,3 @@
 <main class="mx-auto max-w-7xl px-6 py-8">
 	{@render children()}
 </main>
-
-<div style="display:none">
-	{#each locales as locale (locale)}
-		<a href={resolve(localizeHref(page.url.pathname, { locale }) as Pathname)}>{locale}</a>
-	{/each}
-</div>
