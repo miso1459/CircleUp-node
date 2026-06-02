@@ -4,7 +4,7 @@ import { auth } from '$lib/server/auth';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
 import type { Handle } from '@sveltejs/kit';
 import type { User } from 'better-auth';
-import { getTextDirection } from '$lib/paraglide/runtime';
+import { getTextDirection, cookieName, cookieMaxAge, cookieDomain } from '$lib/paraglide/runtime';
 import { paraglideMiddleware } from '$lib/paraglide/server';
 import { getUserById } from '$lib/server/services/user.service';
 
@@ -46,11 +46,15 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
  *
  * - Fresh login: ALWAYS override cookie from DB (user's profile language takes priority).
  * - Existing session: respect existing cookie (user's manual nav switch is preserved).
+ *
+ * Sets BOTH request cookie (for SSR rendering) AND response Set-Cookie
+ * (so the browser persists the preference for client-side hydration).
  */
 const handleLangSync: Handle = async ({ event, resolve }) => {
 	if (event.locals.user && event.locals.isFreshLogin) {
 		const dbUser = await getUserById(event.locals.user.id);
 		if (dbUser?.lang) {
+			// 1. Modify request headers so paraglideMiddleware reads correct locale for SSR
 			const newHeaders = new Headers(event.request.headers);
 			const existingCookie = event.request.headers.get('cookie') || '';
 			const cookies = existingCookie
@@ -59,6 +63,13 @@ const handleLangSync: Handle = async ({ event, resolve }) => {
 			cookies.unshift(`PARAGLIDE_LOCALE=${dbUser.lang}`);
 			newHeaders.set('cookie', cookies.join('; '));
 			event.request = new Request(event.request, { headers: newHeaders });
+
+			// 2. After resolve, set Set-Cookie on response so browser persists it
+			const response = await resolve(event);
+			const newResponse = new Response(response.body, response);
+			const cookieValue = `${cookieName}=${dbUser.lang}; Path=/; Max-Age=${cookieMaxAge}${cookieDomain ? `; Domain=${cookieDomain}` : ''}`;
+			newResponse.headers.append('Set-Cookie', cookieValue);
+			return newResponse;
 		}
 	}
 	return resolve(event);
