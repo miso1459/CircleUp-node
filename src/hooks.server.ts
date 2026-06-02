@@ -36,20 +36,26 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 
 /**
  * Sync the user's DB lang preference to the Paraglide locale cookie
- * so that logged-in users always see the site in their preferred language.
+ * ONLY on first login (when no PARAGLIDE_LOCALE cookie exists).
+ * User-initiated language changes via UI are preserved and NOT overwritten.
  */
 const handleLangSync: Handle = async ({ event, resolve }) => {
 	if (event.locals.user) {
-		const dbUser = await getUserById(event.locals.user.id);
-		if (dbUser?.lang) {
-			const newHeaders = new Headers(event.request.headers);
-			const existingCookie = event.request.headers.get('cookie') || '';
-			const cookies = existingCookie
-				.split('; ')
-				.filter((c) => !c.startsWith('PARAGLIDE_LOCALE='));
-			cookies.unshift(`PARAGLIDE_LOCALE=${dbUser.lang}`);
-			newHeaders.set('cookie', cookies.join('; '));
-			event.request = new Request(event.request, { headers: newHeaders });
+		const existingCookie = event.request.headers.get('cookie') || '';
+		const hasLocaleCookie = existingCookie.includes('PARAGLIDE_LOCALE=');
+
+		// Only set cookie from DB if user doesn't already have one
+		if (!hasLocaleCookie) {
+			const dbUser = await getUserById(event.locals.user.id);
+			if (dbUser?.lang) {
+				const newHeaders = new Headers(event.request.headers);
+				const cookies = existingCookie
+					.split('; ')
+					.filter((c) => !c.startsWith('PARAGLIDE_LOCALE='));
+				cookies.unshift(`PARAGLIDE_LOCALE=${dbUser.lang}`);
+				newHeaders.set('cookie', cookies.join('; '));
+				event.request = new Request(event.request, { headers: newHeaders });
+			}
 		}
 	}
 	return resolve(event);

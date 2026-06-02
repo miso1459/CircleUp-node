@@ -26,21 +26,8 @@
 		en: 'English'
 	};
 
-	async function switchLanguage(locale: string) {
-		// If logged in, update user's lang in DB first
-		if (data.user) {
-			try {
-				const res = await fetch('/api/update-lang', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ lang: locale })
-				});
-				if (!res.ok) return;
-			} catch {
-				return;
-			}
-		}
-		// Set locale cookie and reload page
+	function switchLanguage(locale: string) {
+		// Set locale cookie and reload page (does NOT update user's DB lang)
 		setLocale(locale as 'ko' | 'en');
 	}
 </script>
