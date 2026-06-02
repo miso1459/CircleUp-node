@@ -41,9 +41,7 @@
 					<!-- Show logout when authenticated -->
 					<form method="POST" action="/logout">
 						<button type="submit" class="flex w-full cursor-pointer items-center gap-2 rounded-lg p-2 text-sm transition-all hover:bg-muted focus-visible:ring-3 focus-visible:outline-1">
-							{currentLocale === 'ko'
-								? m.nav_logout()
-								: `${m.nav_logout()} (${user.name})`}
+							{m.nav_logout()}
 						</button>
 					</form>
 				{:else if item.path === '/logout'}
