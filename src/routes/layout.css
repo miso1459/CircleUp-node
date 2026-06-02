@@ -1,6 +1,6 @@
+@import 'https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap';
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import 'https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap';
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
