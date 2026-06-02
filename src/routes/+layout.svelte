@@ -59,14 +59,16 @@
 		<!-- User dropdown menu -->
 		{#if data.user}
 			<DropdownMenu>
-				<DropdownMenuTrigger>
-					<button class="ml-4 flex items-center gap-2 rounded-full border border-border/50 bg-muted/50 px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted">
+			<DropdownMenuTrigger>
+				{#snippet child({ props })}
+					<div {...props} class="ml-4 flex items-center gap-2 rounded-full border border-border/50 bg-muted/50 px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted cursor-pointer">
 						<div class="flex size-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
 							{data.user.name?.charAt(0)?.toUpperCase() ?? '?'}
 						</div>
 						<span class="hidden sm:inline">{data.user.name}</span>
-					</button>
-				</DropdownMenuTrigger>
+					</div>
+				{/snippet}
+			</DropdownMenuTrigger>
 				<DropdownMenuContent align="end" class="w-48">
 					<DropdownMenuLabel>
 						<div class="flex flex-col gap-0.5">
