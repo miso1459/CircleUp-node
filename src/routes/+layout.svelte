@@ -7,6 +7,16 @@
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { ModeWatcher } from "mode-watcher";	
+	import {
+		DropdownMenu,
+		DropdownMenuTrigger,
+		DropdownMenuContent,
+		DropdownMenuItem,
+		DropdownMenuSeparator,
+		DropdownMenuLabel
+	} from '$lib/components/ui/dropdown-menu';
+	import User from '@lucide/svelte/icons/user';
+	import LogOut from '@lucide/svelte/icons/log-out';
 
 	let { children, data } = $props();
 </script>
@@ -34,14 +44,41 @@
 			<NavigationMenu items={data.menus} user={data.user} />
 		</div>
 
-		<!-- User avatar / mode toggle area -->
+		<!-- User dropdown menu -->
 		{#if data.user}
-			<a href="/user/profile" class="ml-4 flex items-center gap-2 rounded-full border border-border/50 bg-muted/50 px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted">
-				<div class="flex size-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-					{data.user.name?.charAt(0)?.toUpperCase() ?? '?'}
-				</div>
-				<span class="hidden sm:inline">{data.user.name}</span>
-			</a>
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<button class="ml-4 flex items-center gap-2 rounded-full border border-border/50 bg-muted/50 px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted">
+						<div class="flex size-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+							{data.user.name?.charAt(0)?.toUpperCase() ?? '?'}
+						</div>
+						<span class="hidden sm:inline">{data.user.name}</span>
+					</button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent align="end" class="w-48">
+					<DropdownMenuLabel>
+						<div class="flex flex-col gap-0.5">
+							<span class="font-medium">{data.user.name}</span>
+							<span class="text-xs text-muted-foreground">{data.user.email}</span>
+						</div>
+					</DropdownMenuLabel>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem asChild>
+						<a href="/user/profile" class="flex cursor-pointer items-center gap-2">
+							<User class="size-4" />
+							<span>프로필</span>
+						</a>
+					</DropdownMenuItem>
+					<DropdownMenuItem asChild>
+						<form method="POST" action="/logout" class="w-full">
+							<button type="submit" class="flex w-full cursor-pointer items-center gap-2">
+								<LogOut class="size-4" />
+								<span>로그아웃</span>
+							</button>
+						</form>
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
 		{/if}
 	</div>
 </header>

@@ -37,7 +37,7 @@
 			{:else if item.path === '/login' && item.ko_name === '로그인' && user !== null}
 				<!-- HIDE Login entry when authenticated -->
 			{:else if item.ko_name === '로그아웃' && user !== null}
-				<!-- Show logout with username when authenticated -->
+				<!-- Show logout when authenticated -->
 				<form method="POST" action="/logout">
 					<button type="submit" class="flex w-full cursor-pointer items-center gap-2 rounded-lg p-2 text-sm transition-all hover:bg-muted focus-visible:ring-3 focus-visible:outline-1">
 						{currentLocale === 'ko'
@@ -46,7 +46,7 @@
 					</button>
 				</form>
 			{:else if item.ko_name === '로그아웃'}
-				<!-- HIDE Logout entry when not authenticated -->
+				<!-- HIDE Logout when not authenticated -->
 			{:else}
 					<NavigationMenuLink href={localizeHref(item.path ?? '/')}>
 						{localizeName(item)}
