@@ -7,6 +7,7 @@
 	"nav_logout": "Sign Out",
 	"nav_profile": "Profile",
 	"nav_menu_management": "Menu Management",
+	"nav_settings": "Settings",
 
 	"auth_sign_in": "Sign In",
 	"auth_sign_up": "Sign Up",
@@ -56,5 +57,27 @@
 	"common_edit": "Edit",
 	"common_confirm": "Confirm",
 	"common_loading": "Loading...",
-	"common_error": "An error occurred"
+	"common_error": "An error occurred",
+
+	"dropdown_language": "Language",
+	"dropdown_profile": "Profile",
+	"dropdown_logout": "Sign Out",
+
+	"home_hero_title": "Connect. Collaborate.<br /><span class=\"text-primary\">Circle Up.</span>",
+	"home_hero_subtitle": "A modern platform for teams to organize, share, and build together. Streamline your workflow with intuitive menus and role-based access.",
+	"home_hero_cta": "Get Started",
+	"home_hero_learn_more": "Learn More",
+
+	"home_features_title": "Built for modern teams",
+	"home_features_subtitle": "Everything you need to manage your team's workspace, from menu organization to user roles.",
+	"home_feature_menu_title": "Menu Management",
+	"home_feature_menu_desc": "Organize your navigation with drag-and-drop. Create folders, set permissions, and reorder items effortlessly.",
+	"home_feature_role_title": "Role-Based Access",
+	"home_feature_role_desc": "Control who sees what with granular role assignments. Admin, user, and custom roles supported.",
+	"home_feature_lang_title": "Multi-Language",
+	"home_feature_lang_desc": "Support for Korean and English out of the box. Localized content with seamless language switching.",
+
+	"home_cta_title": "Ready to get started?",
+	"home_cta_desc": "Join your team on CircleUp and start building better workflows today.",
+	"home_cta_button": "Sign In to CircleUp"
 }

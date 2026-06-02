@@ -1,3 +1,7 @@
+<script lang="ts">
+	import * as m from '$lib/paraglide/messages';
+</script>
+
 <!-- Hero Section -->
 <section class="relative flex min-h-[70dvh] flex-col items-center justify-center overflow-hidden text-center">
 	<!-- Background gradient orbs -->
@@ -20,13 +24,11 @@
 		</div>
 
 		<h1 class="text-5xl font-bold tracking-tight text-foreground md:text-7xl">
-			Connect. Collaborate.<br />
-			<span class="text-primary">Circle Up.</span>
+			{@html m.home_hero_title()}
 		</h1>
 
 		<p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-			A modern platform for teams to organize, share, and build together.
-			Streamline your workflow with intuitive menus and role-based access.
+			{m.home_hero_subtitle()}
 		</p>
 
 		<div class="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
@@ -34,7 +36,7 @@
 				href="/login"
 				class="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-sm font-medium text-primary-foreground shadow-md shadow-primary/20 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/25 active:scale-[0.98]"
 			>
-				Get Started
+				{m.home_hero_cta()}
 			</a>
 			<a
 				href="https://svelte.dev/docs/kit"
@@ -42,7 +44,7 @@
 				rel="noopener noreferrer"
 				class="inline-flex h-12 items-center justify-center rounded-xl border border-border/60 bg-background px-8 text-sm font-medium text-foreground transition-all duration-200 hover:bg-muted/60 hover:shadow-sm active:scale-[0.98]"
 			>
-				Learn More
+				{m.home_hero_learn_more()}
 			</a>
 		</div>
 	</div>
@@ -52,9 +54,9 @@
 <section class="py-24">
 	<div class="mx-auto max-w-5xl px-6">
 		<div class="mb-16 text-center">
-			<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">Built for modern teams</h2>
+			<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">{m.home_features_title()}</h2>
 			<p class="mx-auto mt-4 max-w-xl text-muted-foreground">
-				Everything you need to manage your team's workspace, from menu organization to user roles.
+				{m.home_features_subtitle()}
 			</p>
 		</div>
 
@@ -69,9 +71,9 @@
 						<rect x="14" y="14" width="7" height="7" rx="1" />
 					</svg>
 				</div>
-				<h3 class="mb-2 text-lg font-semibold text-foreground">Menu Management</h3>
+				<h3 class="mb-2 text-lg font-semibold text-foreground">{m.home_feature_menu_title()}</h3>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					Organize your navigation with drag-and-drop. Create folders, set permissions, and reorder items effortlessly.
+					{m.home_feature_menu_desc()}
 				</p>
 			</div>
 
@@ -85,9 +87,9 @@
 						<path d="M16 3.13a4 4 0 0 1 0 7.75" />
 					</svg>
 				</div>
-				<h3 class="mb-2 text-lg font-semibold text-foreground">Role-Based Access</h3>
+				<h3 class="mb-2 text-lg font-semibold text-foreground">{m.home_feature_role_title()}</h3>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					Control who sees what with granular role assignments. Admin, user, and custom roles supported.
+					{m.home_feature_role_desc()}
 				</p>
 			</div>
 
@@ -100,9 +102,9 @@
 						<path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
 					</svg>
 				</div>
-				<h3 class="mb-2 text-lg font-semibold text-foreground">Multi-Language</h3>
+				<h3 class="mb-2 text-lg font-semibold text-foreground">{m.home_feature_lang_title()}</h3>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					Support for Korean and English out of the box. Localized content with seamless language switching.
+					{m.home_feature_lang_desc()}
 				</p>
 			</div>
 		</div>
@@ -113,16 +115,16 @@
 <section class="py-24">
 	<div class="mx-auto max-w-3xl px-6 text-center">
 		<div class="rounded-3xl border border-border/50 bg-card p-12 md:p-16">
-			<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">Ready to get started?</h2>
+			<h2 class="text-3xl font-bold tracking-tight text-foreground md:text-4xl">{m.home_cta_title()}</h2>
 			<p class="mx-auto mt-4 max-w-lg text-muted-foreground">
-				Join your team on CircleUp and start building better workflows today.
+				{m.home_cta_desc()}
 			</p>
 			<div class="mt-8">
 				<a
 					href="/login"
 					class="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-sm font-medium text-primary-foreground shadow-md shadow-primary/20 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/25 active:scale-[0.98]"
 				>
-					Sign In to CircleUp
+					{m.home_cta_button()}
 				</a>
 			</div>
 		</div>

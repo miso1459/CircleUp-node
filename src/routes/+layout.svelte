@@ -2,7 +2,8 @@
 	import type { Pathname } from '$app/types';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import { locales, localizeHref } from '$lib/paraglide/runtime';
+	import { locales, localizeHref, getLocale } from '$lib/paraglide/runtime';
+	import * as m from '$lib/paraglide/messages';
 	import NavigationMenu from '$lib/components/blocks/NavigationMenu.svelte';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
@@ -17,8 +18,16 @@
 	} from '$lib/components/ui/dropdown-menu';
 	import User from '@lucide/svelte/icons/user';
 	import LogOut from '@lucide/svelte/icons/log-out';
+	import Languages from '@lucide/svelte/icons/languages';
 
 	let { children, data } = $props();
+
+	const currentLocale = $derived(getLocale());
+
+	const localeLabels: Record<string, string> = {
+		ko: '한국어',
+		en: 'English'
+	};
 </script>
 
 <ModeWatcher />
@@ -47,7 +56,7 @@
 		<!-- User dropdown menu -->
 		{#if data.user}
 			<DropdownMenu>
-				<DropdownMenuTrigger asChild>
+				<DropdownMenuTrigger>
 					<button class="ml-4 flex items-center gap-2 rounded-full border border-border/50 bg-muted/50 px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted">
 						<div class="flex size-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
 							{data.user.name?.charAt(0)?.toUpperCase() ?? '?'}
@@ -63,17 +72,38 @@
 						</div>
 					</DropdownMenuLabel>
 					<DropdownMenuSeparator />
-					<DropdownMenuItem asChild>
-						<a href="/user/profile" class="flex cursor-pointer items-center gap-2">
+					<!-- Language selector -->
+					<div class="px-2 py-1.5">
+						<div class="mb-1 flex items-center gap-2 px-2 text-xs font-medium text-muted-foreground">
+							<Languages class="size-3.5" />
+							<span>{m.dropdown_language()}</span>
+						</div>
+						{#each locales as locale (locale)}
+							<a
+								href={resolve(localizeHref(page.url.pathname, { locale }) as Pathname)}
+								class="flex w-full cursor-pointer items-center rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted {locale === currentLocale ? 'font-medium text-foreground' : 'text-muted-foreground'}"
+							>
+								{#if locale === currentLocale}
+									<svg class="mr-2 size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<polyline points="20 6 9 17 4 12" />
+									</svg>
+								{/if}
+								<span>{localeLabels[locale] ?? locale}</span>
+							</a>
+						{/each}
+					</div>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem>
+						<a href="/user/profile" class="flex w-full cursor-pointer items-center gap-2">
 							<User class="size-4" />
-							<span>프로필</span>
+							<span>{m.dropdown_profile()}</span>
 						</a>
 					</DropdownMenuItem>
-					<DropdownMenuItem asChild>
+					<DropdownMenuItem>
 						<form method="POST" action="/logout" class="w-full">
 							<button type="submit" class="flex w-full cursor-pointer items-center gap-2">
 								<LogOut class="size-4" />
-								<span>로그아웃</span>
+								<span>{m.dropdown_logout()}</span>
 							</button>
 						</form>
 					</DropdownMenuItem>

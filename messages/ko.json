@@ -7,6 +7,7 @@
 	"nav_logout": "로그아웃",
 	"nav_profile": "프로필",
 	"nav_menu_management": "메뉴 관리",
+	"nav_settings": "설정",
 
 	"auth_sign_in": "로그인",
 	"auth_sign_up": "회원가입",
@@ -56,5 +57,27 @@
 	"common_edit": "수정",
 	"common_confirm": "확인",
 	"common_loading": "로딩 중...",
-	"common_error": "오류가 발생했습니다"
+	"common_error": "오류가 발생했습니다",
+
+	"dropdown_language": "언어",
+	"dropdown_profile": "프로필",
+	"dropdown_logout": "로그아웃",
+
+	"home_hero_title": "연결하고 협업하고<br /><span class=\"text-primary\">Circle Up.</span>",
+	"home_hero_subtitle": "팀이 함께 정리하고, 공유하고, 만들어가는 모던 플랫폼. 직관적인 메뉴와 역할 기반 접근으로 워크플로우를 효율적으로 관리하세요.",
+	"home_hero_cta": "시작하기",
+	"home_hero_learn_more": "자세히 알아보기",
+
+	"home_features_title": "모던 팀을 위한 설계",
+	"home_features_subtitle": "메뉴 구성부터 사용자 역할까지, 팀 워크스페이스 관리에 필요한 모든 것을 제공합니다.",
+	"home_feature_menu_title": "메뉴 관리",
+	"home_feature_menu_desc": "드래그 앤 드롭으로 네비게이션을 구성하세요. 폴더 생성, 권한 설정, 아이템 순서를 손쉽게 관리할 수 있습니다.",
+	"home_feature_role_title": "역할 기반 접근",
+	"home_feature_role_desc": "세분화된 역할 할당으로 누가 무엇을 볼지 제어하세요. 관리자, 사용자, 커스텀 역할을 지원합니다.",
+	"home_feature_lang_title": "다국어 지원",
+	"home_feature_lang_desc": "한국어와 영어를 기본으로 지원합니다. 매끄러운 언어 전환으로 로컬라이즈된 콘텐츠를 제공합니다.",
+
+	"home_cta_title": "시작할 준비가 되셨나요?",
+	"home_cta_desc": "CircleUp에 팀을 참여하고 더 나은 워크플로우를 만들어 보세요.",
+	"home_cta_button": "CircleUp 시작하기"
 }
