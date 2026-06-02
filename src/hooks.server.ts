@@ -43,10 +43,14 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 const handleLangSync: Handle = async ({ event, resolve }) => {
 	if (event.locals.user) {
 		const existingCookie = event.request.headers.get('cookie') || '';
-		const hasSyncedFlag = existingCookie.includes('PARAGLIDE_LANG_SYNCED=');
+		const sessionToken = event.locals.session?.token;
 
-		if (!hasSyncedFlag) {
-			// First request after login: sync from DB
+		// Check if we already synced for THIS session
+		const syncMatch = existingCookie.match(/PARAGLIDE_LANG_SYNCED=([^;]+)/);
+		const syncedToken = syncMatch?.[1];
+
+		if (syncedToken !== sessionToken) {
+			// New session: sync from DB
 			const dbUser = await getUserById(event.locals.user.id);
 			if (dbUser?.lang) {
 				const newHeaders = new Headers(event.request.headers);
@@ -58,7 +62,7 @@ const handleLangSync: Handle = async ({ event, resolve }) => {
 							!c.startsWith('PARAGLIDE_LANG_SYNCED=')
 					);
 				cookies.unshift(`PARAGLIDE_LOCALE=${dbUser.lang}`);
-				cookies.unshift('PARAGLIDE_LANG_SYNCED=true');
+				cookies.unshift(`PARAGLIDE_LANG_SYNCED=${sessionToken}`);
 				newHeaders.set('cookie', cookies.join('; '));
 				event.request = new Request(event.request, { headers: newHeaders });
 
@@ -68,9 +72,10 @@ const handleLangSync: Handle = async ({ event, resolve }) => {
 					'Set-Cookie',
 					`${cookieName}=${dbUser.lang}; Path=/; Max-Age=${cookieMaxAge}${cookieDomain ? `; Domain=${cookieDomain}` : ''}`
 				);
+				// Use session-scoped cookie (expires when session ends)
 				newResponse.headers.append(
 					'Set-Cookie',
-					`PARAGLIDE_LANG_SYNCED=true; Path=/; Max-Age=${cookieMaxAge}${cookieDomain ? `; Domain=${cookieDomain}` : ''}`
+					`PARAGLIDE_LANG_SYNCED=${sessionToken}; Path=/; SameSite=Lax`
 				);
 				return newResponse;
 			}
