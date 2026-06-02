@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { locales, getLocale, setLocale } from '$lib/paraglide/runtime';
+	import { locales, getLocale, cookieName, cookieMaxAge } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 	import NavigationMenu from '$lib/components/blocks/NavigationMenu.svelte';
 	import './layout.css';
@@ -28,7 +28,8 @@
 
 	function switchLanguage(locale: string) {
 		// Set locale cookie and reload page (does NOT update user's DB lang)
-		setLocale(locale as 'ko' | 'en');
+		document.cookie = `${cookieName}=${locale}; path=/; max-age=${cookieMaxAge}`;
+		window.location.reload();
 	}
 </script>
 
