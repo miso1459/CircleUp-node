@@ -26,16 +26,9 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 	if (session) {
 		event.locals.session = session.session;
 		event.locals.user = session.user as User & { role: string; lang: string };
-
-		// Detect fresh login: session created within last 30 seconds
-		const createdAt = session.session.createdAt instanceof Date
-			? session.session.createdAt.getTime()
-			: new Date(session.session.createdAt).getTime();
-		event.locals.isFreshLogin = (Date.now() - createdAt) < 30_000;
 	} else {
 		event.locals.user = null;
 		event.locals.session = null;
-		event.locals.isFreshLogin = false;
 	}
 
 	return svelteKitHandler({ event, resolve, auth, building });
@@ -44,32 +37,43 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 /**
  * Sync the user's DB lang preference to the Paraglide locale cookie.
  *
- * - Fresh login: ALWAYS override cookie from DB (user's profile language takes priority).
- * - Existing session: respect existing cookie (user's manual nav switch is preserved).
- *
- * Sets BOTH request cookie (for SSR rendering) AND response Set-Cookie
- * (so the browser persists the preference for client-side hydration).
+ * Only syncs ONCE per session (tracked via PARAGLIDE_LANG_SYNCED cookie).
+ * After the initial sync, user's manual nav language changes are preserved.
  */
 const handleLangSync: Handle = async ({ event, resolve }) => {
-	if (event.locals.user && event.locals.isFreshLogin) {
-		const dbUser = await getUserById(event.locals.user.id);
-		if (dbUser?.lang) {
-			// 1. Modify request headers so paraglideMiddleware reads correct locale for SSR
-			const newHeaders = new Headers(event.request.headers);
-			const existingCookie = event.request.headers.get('cookie') || '';
-			const cookies = existingCookie
-				.split('; ')
-				.filter((c) => !c.startsWith('PARAGLIDE_LOCALE='));
-			cookies.unshift(`PARAGLIDE_LOCALE=${dbUser.lang}`);
-			newHeaders.set('cookie', cookies.join('; '));
-			event.request = new Request(event.request, { headers: newHeaders });
+	if (event.locals.user) {
+		const existingCookie = event.request.headers.get('cookie') || '';
+		const hasSyncedFlag = existingCookie.includes('PARAGLIDE_LANG_SYNCED=');
 
-			// 2. After resolve, set Set-Cookie on response so browser persists it
-			const response = await resolve(event);
-			const newResponse = new Response(response.body, response);
-			const cookieValue = `${cookieName}=${dbUser.lang}; Path=/; Max-Age=${cookieMaxAge}${cookieDomain ? `; Domain=${cookieDomain}` : ''}`;
-			newResponse.headers.append('Set-Cookie', cookieValue);
-			return newResponse;
+		if (!hasSyncedFlag) {
+			// First request after login: sync from DB
+			const dbUser = await getUserById(event.locals.user.id);
+			if (dbUser?.lang) {
+				const newHeaders = new Headers(event.request.headers);
+				const cookies = existingCookie
+					.split('; ')
+					.filter(
+						(c) =>
+							!c.startsWith('PARAGLIDE_LOCALE=') &&
+							!c.startsWith('PARAGLIDE_LANG_SYNCED=')
+					);
+				cookies.unshift(`PARAGLIDE_LOCALE=${dbUser.lang}`);
+				cookies.unshift('PARAGLIDE_LANG_SYNCED=true');
+				newHeaders.set('cookie', cookies.join('; '));
+				event.request = new Request(event.request, { headers: newHeaders });
+
+				const response = await resolve(event);
+				const newResponse = new Response(response.body, response);
+				newResponse.headers.append(
+					'Set-Cookie',
+					`${cookieName}=${dbUser.lang}; Path=/; Max-Age=${cookieMaxAge}${cookieDomain ? `; Domain=${cookieDomain}` : ''}`
+				);
+				newResponse.headers.append(
+					'Set-Cookie',
+					`PARAGLIDE_LANG_SYNCED=true; Path=/; Max-Age=${cookieMaxAge}${cookieDomain ? `; Domain=${cookieDomain}` : ''}`
+				);
+				return newResponse;
+			}
 		}
 	}
 	return resolve(event);
