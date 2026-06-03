@@ -16,7 +16,7 @@ export const auth = betterAuth({
 			role: {
 				type: 'string',
 				required: true,
-				defaultValue: 'user',
+				defaultValue: 'guest',
 				input: false
 			},
 			lang: {
@@ -24,6 +24,12 @@ export const auth = betterAuth({
 				required: true,
 				defaultValue: 'ko',
 				input: true
+			},
+			isActive: {
+				type: 'boolean',
+				required: true,
+				defaultValue: true,
+				input: false
 			}
 		}
 	},
