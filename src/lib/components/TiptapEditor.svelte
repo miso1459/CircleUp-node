@@ -139,7 +139,9 @@
 				<Minus class="size-4" />
 			</Button>
 
-
+			<div class="ml-auto">
+				<Button variant="default" size="sm" onclick={handleSave}>Save</Button>
+			</div>
 		</div>
 	{/if}
 

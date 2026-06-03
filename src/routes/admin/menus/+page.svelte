@@ -178,8 +178,8 @@
 		const fd = new FormData();
 		fd.append('id', promptEditItemId);
 		fd.append('prompt', markdown);
-		await fetch('?/updatePrompt', { method: 'POST', body: fd });
-		promptDialogOpen = false;
+		const res = await fetch('?/updatePrompt', { method: 'POST', body: fd });
+		if (res.ok) window.location.reload();
 	}
 
 	// -----------------------------------------------------------------------
@@ -831,17 +831,11 @@
 				<TiptapEditor
 					bind:this={promptEditorRef}
 					content={promptContent}
-					onSave={(md) => {
+					onSave={(md: string) => {
 						promptContent = md;
 						savePrompt();
 					}}
 				/>
-
-				<div class="flex justify-end gap-2 pt-2">
-					<DialogClose onclick={() => savePrompt()}>
-						<Button type="button">{m.common_save()}</Button>
-					</DialogClose>
-				</div>
 			</div>
 		</DialogContent>
 	</Dialog>
