@@ -178,8 +178,8 @@
 		const fd = new FormData();
 		fd.append('id', promptEditItemId);
 		fd.append('prompt', markdown);
-		const res = await fetch('?/updatePrompt', { method: 'POST', body: fd });
-		if (res.ok) window.location.reload();
+		await fetch('?/updatePrompt', { method: 'POST', body: fd });
+		promptDialogOpen = false;
 	}
 
 	// -----------------------------------------------------------------------
@@ -833,16 +833,14 @@
 					content={promptContent}
 					onSave={(md) => {
 						promptContent = md;
+						savePrompt();
 					}}
 				/>
 
 				<div class="flex justify-end gap-2 pt-2">
-					<DialogClose>
-						<Button variant="outline" type="button">{m.common_cancel()}</Button>
+					<DialogClose onclick={() => savePrompt()}>
+						<Button type="button">{m.common_save()}</Button>
 					</DialogClose>
-					<Button onclick={savePrompt} class="transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
-						{m.common_save()}
-					</Button>
 				</div>
 			</div>
 		</DialogContent>
