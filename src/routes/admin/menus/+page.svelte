@@ -629,11 +629,20 @@
 				</DialogTitle>
 			</DialogHeader>
 
-			<form
-				method="POST"
-				action={editMode ? '?/updateMenu' : '?/createMenu'}
-				class="space-y-5"
-			>
+	<form
+		method="POST"
+		action={editMode ? '?/updateMenu' : '?/createMenu'}
+		use:enhance={() => {
+			return ({ result }) => {
+				if (result.type === 'success') {
+					dialogOpen = false;
+					resetForm();
+					window.location.reload();
+				}
+			};
+		}}
+		class="space-y-5"
+	>
 				{#if editMode && editItemId}
 					<input type="hidden" name="id" value={editItemId} />
 				{/if}
