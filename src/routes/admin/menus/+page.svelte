@@ -24,6 +24,8 @@
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import NotePencil from '@lucide/svelte/icons/notebook-pen';
+	import TiptapEditor from '$lib/components/TiptapEditor.svelte';
 	import type { MenuTreeNode } from '$lib/server/services/menu.service';
 	import { SvelteSet } from 'svelte/reactivity';
 
@@ -105,6 +107,14 @@
 	let formSortOrder = $state(0);
 	let formParentId = $state('');
 	let formIsActive = $state(true);
+	let formPrompt = $state('');
+
+	// Prompt dialog state
+	let promptDialogOpen = $state(false);
+	let promptEditItemId = $state<string | null>(null);
+	let promptEditItemName = $state('');
+	let promptContent = $state('');
+	let promptEditorRef = $state<any>(null);
 
 	const roleOptions = ['admin', 'user', 'all'] as const;
 
@@ -118,6 +128,7 @@
 		formSortOrder = 0;
 		formParentId = '';
 		formIsActive = true;
+		formPrompt = '';
 		formError = '';
 	}
 
@@ -143,6 +154,7 @@
 		formSortOrder = item.sort_order;
 		formParentId = item.parentId || '';
 		formIsActive = item.is_active;
+		formPrompt = item.prompt || '';
 		formError = '';
 		dialogOpen = true;
 	}
@@ -151,6 +163,23 @@
 		deleteItemId = item.id;
 		deleteItemName = item.ko_name;
 		deleteDialogOpen = true;
+	}
+
+	function openPromptDialog(item: MenuTreeNode) {
+		promptEditItemId = item.id;
+		promptEditItemName = item.ko_name;
+		promptContent = item.prompt || '';
+		promptDialogOpen = true;
+	}
+
+	async function savePrompt() {
+		if (!promptEditItemId) return;
+		const markdown = promptEditorRef?.getMarkdown?.() ?? promptContent;
+		const fd = new FormData();
+		fd.append('id', promptEditItemId);
+		fd.append('prompt', markdown);
+		const res = await fetch('?/updatePrompt', { method: 'POST', body: fd });
+		if (res.ok) window.location.reload();
 	}
 
 	// -----------------------------------------------------------------------
@@ -561,6 +590,15 @@
 						<Button
 							variant="ghost"
 							size="icon-xs"
+							onclick={() => openPromptDialog(item)}
+							title="Prompt"
+						>
+							<NotePencil class="size-3.5" />
+						</Button>
+
+						<Button
+							variant="ghost"
+							size="icon-xs"
 							onclick={() => openDeleteDialog(item)}
 							title={m.admin_menus_delete()}
 						>
@@ -733,6 +771,19 @@
 					</div>
 				{/if}
 
+				<!-- prompt (preview textarea) -->
+				<div class="space-y-1.5">
+					<Label for="form_prompt">Prompt</Label>
+					<textarea
+						id="form_prompt"
+						name="prompt"
+						rows="3"
+						bind:value={formPrompt}
+						placeholder="메뉴 프롬프트를 입력하세요..."
+						class="border-input bg-background text-foreground placeholder:text-muted-foreground flex w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+					></textarea>
+				</div>
+
 				<!-- Submit -->
 				<div class="flex justify-end gap-2 pt-3">
 					<DialogClose>
@@ -764,6 +815,36 @@
 				</DialogClose>
 				<Button variant="destructive" type="submit">{m.common_delete()}</Button>
 			</form>
+		</DialogContent>
+	</Dialog>
+
+	<!-- ========================================================================
+	     Prompt Editor Dialog
+	     ======================================================================== -->
+	<Dialog bind:open={promptDialogOpen}>
+		<DialogContent class="max-h-[80vh] overflow-y-auto rounded-2xl sm:max-w-2xl">
+			<DialogHeader>
+				<DialogTitle>Prompt - {promptEditItemName}</DialogTitle>
+			</DialogHeader>
+
+			<div class="space-y-4">
+				<TiptapEditor
+					bind:this={promptEditorRef}
+					content={promptContent}
+					onSave={(md) => {
+						promptContent = md;
+					}}
+				/>
+
+				<div class="flex justify-end gap-2 pt-2">
+					<DialogClose>
+						<Button variant="outline" type="button">{m.common_cancel()}</Button>
+					</DialogClose>
+					<Button onclick={savePrompt} class="transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+						{m.common_save()}
+					</Button>
+				</div>
+			</div>
 		</DialogContent>
 	</Dialog>
 </div>

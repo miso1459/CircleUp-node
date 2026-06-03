@@ -38,6 +38,7 @@ export const actions: Actions = {
 			en_name,
 			path: path || null,
 			icon: icon || null,
+			prompt: (formData.get('prompt') as string) || null,
 			role,
 			sort_order,
 			parentId: parentId || null
@@ -57,6 +58,7 @@ export const actions: Actions = {
 		const sort_order = parseInt(formData.get('sort_order') as string) || 0;
 		const parentId = formData.get('parentId') as string | null;
 		const is_active = formData.get('is_active') as string | null;
+		const prompt = formData.get('prompt') as string | null;
 
 		const selectedRoles = formData.getAll('role') as string[];
 		const role = selectedRoles.length > 0 ? selectedRoles : ['all'];
@@ -74,7 +76,8 @@ export const actions: Actions = {
 			role,
 			sort_order,
 			parentId: parentId || null,
-			is_active: is_active === 'true'
+			is_active: is_active === 'true',
+			prompt: prompt ?? null
 		});
 
 		if (!result) {
@@ -95,6 +98,26 @@ export const actions: Actions = {
 		const result = await deleteMenu(id);
 		if (!result.success) {
 			return fail(400, { error: result.message });
+		}
+
+		return { success: true };
+	},
+
+	updatePrompt: async ({ request }) => {
+		const formData = await request.formData();
+		const id = formData.get('id') as string;
+		const prompt = formData.get('prompt') as string | null;
+
+		if (!id) {
+			return fail(400, { error: '메뉴 ID가 누락되었습니다.' });
+		}
+
+		const result = await updateMenu(id, {
+			prompt: prompt ?? null
+		});
+
+		if (!result) {
+			return fail(404, { error: '메뉴를 찾을 수 없습니다.' });
 		}
 
 		return { success: true };
