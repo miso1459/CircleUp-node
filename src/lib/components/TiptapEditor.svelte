@@ -17,10 +17,9 @@
 
 	interface Props {
 		content?: string;
-		onSave?: (markdown: string) => void;
 	}
 
-	let { content = '', onSave }: Props = $props();
+	let { content = '' }: Props = $props();
 
 	let element: HTMLDivElement;
 	let editor = $state<Editor | null>(null);
@@ -33,12 +32,6 @@
 
 	export function getMarkdown(): string {
 		return editor?.getMarkdown() ?? '';
-	}
-
-	function handleSave(): void {
-		if (editor && onSave) {
-			onSave(editor.getMarkdown());
-		}
 	}
 
 	onMount(() => {
@@ -139,9 +132,6 @@
 				<Minus class="size-4" />
 			</Button>
 
-			<div class="ml-auto">
-				<Button variant="default" size="sm" onclick={handleSave}>Save</Button>
-			</div>
 		</div>
 	{/if}
 

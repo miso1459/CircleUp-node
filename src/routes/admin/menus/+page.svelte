@@ -831,11 +831,16 @@
 				<TiptapEditor
 					bind:this={promptEditorRef}
 					content={promptContent}
-					onSave={(md: string) => {
-						promptContent = md;
-						savePrompt();
-					}}
 				/>
+
+				<div class="flex justify-end gap-2 pt-2">
+					<DialogClose>
+						<Button variant="outline" type="button">{m.common_cancel()}</Button>
+					</DialogClose>
+					<Button onclick={savePrompt} class="transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+						{m.common_save()}
+					</Button>
+				</div>
 			</div>
 		</DialogContent>
 	</Dialog>
