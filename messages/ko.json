@@ -37,6 +37,8 @@
 	"admin_users_lang": "언어",
 	"admin_users_edit": "수정",
 	"admin_users_save": "변경사항 저장",
+	"admin_users_is_active": "사용여부",
+	"admin_users_confirm_delete": "정말 삭제하시겠습니까?",
 
 	"admin_menus_add": "메뉴 추가",
 	"admin_menus_edit": "메뉴 수정",

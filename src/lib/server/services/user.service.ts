@@ -14,6 +14,7 @@ export interface User {
 	image: string | null;
 	role: string;
 	lang: string;
+	isActive: boolean;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -38,6 +39,7 @@ function toUser(row: typeof user.$inferSelect): User {
 		image: row.image,
 		role: row.role,
 		lang: row.lang,
+		isActive: row.isActive,
 		createdAt: row.createdAt,
 		updatedAt: row.updatedAt
 	};
@@ -90,5 +92,17 @@ export async function updateUserRole(id: string, role: string): Promise<User | u
 /** Update user lang. Returns undefined when not found. */
 export async function updateUserLang(id: string, lang: string): Promise<User | undefined> {
 	const [row] = await db.update(user).set({ lang }).where(eq(user.id, id)).returning();
+	return row ? toUser(row) : undefined;
+}
+
+/** Delete user by id. Returns undefined when not found. */
+export async function deleteUser(id: string): Promise<User | undefined> {
+	const [row] = await db.delete(user).where(eq(user.id, id)).returning();
+	return row ? toUser(row) : undefined;
+}
+
+/** Update user active status. Returns undefined when not found. */
+export async function updateUserStatus(id: string, isActive: boolean): Promise<User | undefined> {
+	const [row] = await db.update(user).set({ isActive }).where(eq(user.id, id)).returning();
 	return row ? toUser(row) : undefined;
 }

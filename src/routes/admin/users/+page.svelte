@@ -1,4 +1,4 @@
-<script lang="ts">
+	<script lang="ts">
 	import * as m from '$lib/paraglide/messages';
 	import {
 		Table,
@@ -16,12 +16,14 @@
 	} from '$lib/components/ui/select';
 	import { Button } from '$lib/components/ui/button';
 	import { Badge } from '$lib/components/ui/badge';
+	import { Switch } from '$lib/components/ui/switch';
 
 	let { data } = $props();
 
 	interface UserEdit {
 		role: string;
 		lang: string;
+		isActive: boolean;
 	}
 
 	// Track only the edits (diffs from server data), initialized from props
@@ -31,12 +33,12 @@
 	$effect(() => {
 		const next: Record<string, UserEdit> = {};
 		for (const u of data.users) {
-			next[u.id] = { role: u.role, lang: u.lang };
+			next[u.id] = { role: u.role, lang: u.lang, isActive: u.isActive };
 		}
 		edits = next;
 	});
 
-	const roleOptions = ['admin', 'user'];
+	const roleOptions = ['guest', 'user', 'admin'];
 	const langOptions = ['ko', 'en'];
 </script>
 
@@ -54,12 +56,13 @@
 					<TableHead class="font-medium">{m.admin_users_name()}</TableHead>
 					<TableHead class="font-medium">{m.admin_users_role()}</TableHead>
 					<TableHead class="font-medium">{m.admin_users_lang()}</TableHead>
+					<TableHead class="font-medium">{m.admin_users_is_active()}</TableHead>
 					<TableHead class="w-32"></TableHead>
 				</TableRow>
 			</TableHeader>
 			<TableBody>
 				{#each data.users as user (user.id)}
-					{@const edit = edits[user.id] ?? { role: user.role, lang: user.lang }}
+					{@const edit = edits[user.id] ?? { role: user.role, lang: user.lang, isActive: user.isActive }}
 					<TableRow class="transition-colors hover:bg-muted/40">
 						<TableCell class="font-medium">
 							{user.email}
@@ -68,7 +71,7 @@
 						<TableCell>
 							<div class="flex items-center gap-2">
 								<Badge
-									variant={user.role === 'admin' ? 'default' : 'secondary'}
+									variant={user.role === 'admin' ? 'default' : user.role === 'guest' ? 'outline' : 'secondary'}
 									class="hidden rounded-md sm:inline-flex"
 								>
 									{user.role}
@@ -110,15 +113,34 @@
 							</Select>
 						</TableCell>
 						<TableCell>
-							<form method="POST" action="?/updateUser">
-								<input type="hidden" name="userId" value={user.id} />
-								<input type="hidden" name="name" value={user.name} />
-								<input type="hidden" name="role" value={edit.role} />
-								<input type="hidden" name="lang" value={edit.lang} />
-								<Button type="submit" class="transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
-									{m.admin_users_save()}
-								</Button>
-							</form>
+							<Switch
+								checked={edit.isActive}
+								onCheckedChange={(v: boolean) => {
+									edit.isActive = v;
+								}}
+							/>
+						</TableCell>
+						<TableCell>
+							<div class="flex items-center gap-2">
+								<form method="POST" action="?/updateUser">
+									<input type="hidden" name="userId" value={user.id} />
+									<input type="hidden" name="name" value={user.name} />
+									<input type="hidden" name="role" value={edit.role} />
+									<input type="hidden" name="lang" value={edit.lang} />
+									<input type="hidden" name="isActive" value={edit.isActive} />
+									<Button type="submit" class="transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+										{m.admin_users_save()}
+									</Button>
+								</form>
+								{#if user.role === 'guest'}
+									<form method="POST" action="?/deleteUser">
+										<input type="hidden" name="userId" value={user.id} />
+										<Button type="submit" variant="destructive" size="sm" class="transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+											{m.common_delete()}
+										</Button>
+									</form>
+								{/if}
+							</div>
 						</TableCell>
 					</TableRow>
 				{/each}
