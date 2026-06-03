@@ -16,7 +16,7 @@
 	} from '$lib/components/ui/select';
 	import { Button } from '$lib/components/ui/button';
 	import { Badge } from '$lib/components/ui/badge';
-	import { Switch } from '$lib/components/ui/switch';
+	import { Checkbox } from '$lib/components/ui/checkbox';
 
 	let { data } = $props();
 
@@ -63,6 +63,7 @@
 			<TableBody>
 				{#each data.users as user (user.id)}
 					{@const edit = edits[user.id] ?? { role: user.role, lang: user.lang, isActive: user.isActive }}
+					{@const hasChanges = edit.role !== user.role || edit.lang !== user.lang || edit.isActive !== user.isActive}
 					<TableRow class="transition-colors hover:bg-muted/40">
 						<TableCell class="font-medium">
 							{user.email}
@@ -113,7 +114,7 @@
 							</Select>
 						</TableCell>
 						<TableCell>
-							<Switch
+							<Checkbox
 								checked={edit.isActive}
 								onCheckedChange={(v: boolean) => {
 									edit.isActive = v;
@@ -128,7 +129,7 @@
 									<input type="hidden" name="role" value={edit.role} />
 									<input type="hidden" name="lang" value={edit.lang} />
 									<input type="hidden" name="isActive" value={edit.isActive} />
-									<Button type="submit" class="transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+									<Button type="submit" disabled={!hasChanges} class="transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
 										{m.admin_users_save()}
 									</Button>
 								</form>
