@@ -15,6 +15,7 @@ export const menu = sqliteTable('menu', {
 	role: text('role').notNull().default('["all"]'),
 	sort_order: integer('sort_order').notNull().default(0),
 	is_active: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+	prompt: text('prompt'),
 	createdAt: integer('created_at', { mode: 'timestamp_ms' })
 		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
 		.notNull(),

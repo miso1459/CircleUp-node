@@ -8,6 +8,13 @@
       "when": 1779971543168,
       "tag": "0000_daffy_squirrel_girl",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1780470806271,
+      "tag": "0001_tricky_masque",
+      "breakpoints": true
     }
   ]
 }

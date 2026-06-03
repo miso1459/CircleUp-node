@@ -14,6 +14,7 @@ export interface Menu {
 	ko_name: string;
 	en_name: string;
 	icon: string | null;
+	prompt: string | null;
 	role: string[];
 	sort_order: number;
 	is_active: boolean;
@@ -27,6 +28,7 @@ export interface CreateMenuInput {
 	ko_name: string;
 	en_name: string;
 	icon?: string | null;
+	prompt?: string | null;
 	role?: string[];
 	sort_order?: number;
 	parentId?: string | null;
@@ -38,6 +40,7 @@ export interface UpdateMenuInput {
 	ko_name?: string;
 	en_name?: string;
 	icon?: string | null;
+	prompt?: string | null;
 	role?: string[];
 	sort_order?: number;
 	is_active?: boolean;
@@ -52,6 +55,7 @@ export interface MenuTreeNode {
 	ko_name: string;
 	en_name: string;
 	icon: string | null;
+	prompt: string | null;
 	role: string[];
 	sort_order: number;
 	is_active: boolean;
@@ -85,6 +89,7 @@ function toMenuRowWithRoles(row: typeof menu.$inferSelect): MenuRowWithRoles {
 		ko_name: row.ko_name,
 		en_name: row.en_name,
 		icon: row.icon,
+		prompt: row.prompt,
 		role: parseRole(row.role),
 		sort_order: row.sort_order,
 		is_active: row.is_active,
@@ -122,6 +127,7 @@ function buildTree(
 			ko_name: item.ko_name,
 			en_name: item.en_name,
 			icon: item.icon,
+			prompt: item.prompt,
 			role: item.role,
 			sort_order: item.sort_order,
 			is_active: item.is_active,
@@ -143,6 +149,7 @@ export async function createMenu(input: CreateMenuInput): Promise<Menu> {
 			ko_name: input.ko_name,
 			en_name: input.en_name,
 			icon: input.icon ?? null,
+			prompt: input.prompt ?? null,
 			role: JSON.stringify(input.role ?? ['all']),
 			sort_order: input.sort_order ?? 0,
 			parentId: input.parentId ?? null
@@ -175,6 +182,7 @@ export async function updateMenu(
 	if (input.ko_name !== undefined) values.ko_name = input.ko_name;
 	if (input.en_name !== undefined) values.en_name = input.en_name;
 	if (input.icon !== undefined) values.icon = input.icon;
+	if (input.prompt !== undefined) values.prompt = input.prompt;
 	if (input.role !== undefined) values.role = JSON.stringify(input.role);
 	if (input.sort_order !== undefined) values.sort_order = input.sort_order;
 	if (input.is_active !== undefined) values.is_active = input.is_active;
