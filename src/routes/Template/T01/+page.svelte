@@ -73,8 +73,8 @@
 		<SearchInput placeholder="코드 또는 설명 검색..." class="max-w-xs" />
 	</div>
 
-	<!-- Table area: fills remaining viewport -->
-	<div class="flex-1 min-h-0 pt-4">
+	<!-- Table area: fills remaining viewport, scrolls internally -->
+	<div class="flex-1 min-h-0 overflow-auto pt-4">
 		{#if isError}
 			<!-- Error state -->
 			<div

@@ -36,8 +36,9 @@
 <ModeWatcher />
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 
+<div class="flex h-dvh flex-col overflow-hidden">
 <!-- Sticky top navigation with backdrop blur -->
-<header class="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+<header class="shrink-0 border-b border-border/50 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
 	<div class="mx-auto flex h-16 max-w-7xl items-center px-6">
 		<!-- Logo -->
 		<a href="/" class="mr-8 flex items-center gap-2.5 transition-opacity hover:opacity-80">
@@ -119,6 +120,7 @@
 	</div>
 </header>
 
-<main class="mx-auto max-w-7xl px-6 py-8">
+<main class="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col overflow-y-auto px-6 py-8">
 	{@render children()}
 </main>
+</div>
