@@ -179,9 +179,34 @@ function main(): void {
 			promotedCount++;
 		}
 
-		if (promotedCount === 0) {
-			console.log('  📋 No users needed promotion');
-		}
+	if (promotedCount === 0) {
+		console.log('  📋 No users needed promotion');
+	}
+	}
+
+	// -----------------------------------------------------------------------
+	// 3. Seed Template_02 (idempotent: 30 deterministic rows)
+	// -----------------------------------------------------------------------
+	const existingT02 = db.select().from(schema.template_02).get();
+
+	if (existingT02) {
+		console.log('  ⏭️  Template_02 already has data, skipping');
+	} else {
+		const now = new Date();
+		const baseDate = new Date(2024, 0, 1);
+
+		const t02Rows = Array.from({ length: 30 }, (_, i) => ({
+			date: new Date(baseDate.getTime() + Math.round((i / 29) * 365) * 86_400_000),
+			code: `T02-${String(i + 1).padStart(3, '0')}`,
+			desc: `Template 02 item ${i + 1} description`,
+			createdBy: 'system',
+			createdAt: now,
+			updatedBy: 'system',
+			updatedAt: now
+		}));
+
+		db.insert(schema.template_02).values(t02Rows).run();
+		console.log('  ✅ Created 30 Template_02 rows');
 	}
 
 	console.log('✅ Seed completed');
