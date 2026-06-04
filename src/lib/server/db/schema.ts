@@ -10,3 +10,5 @@ export const task = sqliteTable('task', {
 
 export * from './auth.schema';
 export * from './menu.schema';
+export * from './template-01.schema';
+export * from './template-02.schema';
