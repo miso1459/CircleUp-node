@@ -86,15 +86,15 @@ test.describe('Resizable Dialog', () => {
 		);
 		await page.mouse.up();
 
-		// Assert bounding box changed (width +200, height +160 due to centered resize)
+		// Assert bounding box changed (width +100, height +80 due to 1:1 resize)
 		await expect
 			.poll(async () => {
 				const newBox = await dialog.boundingBox();
 				return { width: newBox?.width, height: newBox?.height };
 			})
 			.toEqual({
-				width: initialBox!.width + 200,
-				height: initialBox!.height + 160
+				width: initialBox!.width + 100,
+				height: initialBox!.height + 80
 			});
 	});
 
@@ -123,8 +123,8 @@ test.describe('Resizable Dialog', () => {
 		);
 		await page.mouse.up();
 
-		const resizedWidth = 700;
-		const resizedHeight = 480;
+		const resizedWidth = 650;
+		const resizedHeight = 440;
 		await expect
 			.poll(async () => {
 				const box = await dialog.boundingBox();
