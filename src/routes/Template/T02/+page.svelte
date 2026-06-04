@@ -83,7 +83,7 @@
 	});
 </script>
 
-<div class="space-y-6">
+<div class="flex h-full flex-col gap-6">
 	<div>
 		<h2 class="text-3xl font-bold tracking-tight">Template 02</h2>
 		<p class="mt-1 text-sm text-muted-foreground">Data inquiry with filters and pagination</p>
@@ -130,7 +130,9 @@
 	</div>
 
 	<!-- Data Table -->
-	<DataTable data={data.items} {columns} />
+	<div class="min-h-0 flex-1 overflow-y-auto">
+		<DataTable data={data.items} {columns} />
+	</div>
 
 	<!-- Pagination -->
 	{#if data.totalPages > 1}
