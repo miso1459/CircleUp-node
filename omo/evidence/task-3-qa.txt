@@ -1,0 +1,20 @@
+T02 Real Manual QA — F3 Integration Test
+==========================================
+Date: 2026-06-04
+Target: /Template/T02
+Playwright: @playwright/test (5 tests, 1 worker)
+
+Scenarios:
+  [1/5] Page load: PASS — Title "Template 02" visible, search input (#search), Start Date (#startDate), End Date (#endDate), DataTable with 8 columns (Id, Date, Code, Desc, CreatedBy, CreatedAt, UpdatedBy, UpdatedAt), pagination "Total 30 records — Page 1 of 2"
+  [2/5] Search: PASS — Typed "CODE" in search, clicked Search button, URL updated to include ?search=CODE, table rendered with empty state ("데이터가 없습니다") — search param propagation verified
+  [3/5] Pagination: PASS — Multiple pages exist (30 records, 2 pages), Next button navigates to page 2, Previous button returns to page 1, URL page param changes correctly
+  [4/5] Empty state: PASS — Searched "NONEXISTENT12345", table shows "데이터가 없습니다." empty state message, no data rows displayed
+  [5/5] Date filter: PASS — Set startDate=2024-01-01, endDate=2024-12-31, clicked Search, URL contains both date params, table rendered
+
+Evidence:
+  omo/evidence/task-3-qa-load.png   — Initial page load (30 records, filters, pagination visible)
+  omo/evidence/task-3-qa-search.png — Search results for "CODE" (empty state, URL verified)
+  omo/evidence/task-3-qa-empty.png  — Empty state for "NONEXISTENT12345"
+
+Integration: PASS
+VERDICT: PASS

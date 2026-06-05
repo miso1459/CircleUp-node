@@ -63,6 +63,14 @@
 	"common_loading": "로딩 중...",
 	"common_error": "오류가 발생했습니다",
 
+	"common_search_placeholder": "검색",
+	"common_search_button": "검색",
+	"common_total_count": "총 {count}건",
+	"common_page_info": "{current}/{total} 페이지",
+	"common_search_result": "\"{search}\" 검색 결과",
+	"common_empty_result": "검색 결과가 없습니다",
+	"common_empty_hint": "다른 검색어로 다시 시도해 주세요.",
+
 	"dropdown_language": "언어",
 	"dropdown_profile": "프로필",
 	"dropdown_logout": "로그아웃",

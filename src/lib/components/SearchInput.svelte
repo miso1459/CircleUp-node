@@ -2,10 +2,11 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { Search, X } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages';
 	import { cn } from '$lib/utils.js';
 
 	let {
-		placeholder = '검색...',
+		placeholder = m.common_search_placeholder(),
 		class: className
 	}: {
 		placeholder?: string;
@@ -58,15 +59,23 @@
 		value={$page.url.searchParams.get('search') ?? ''}
 		{placeholder}
 		onkeydown={handleKeydown}
-		class="h-8 w-full rounded-md border border-input bg-transparent pl-9 pr-8 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+		class="h-8 w-full rounded-md border border-input bg-transparent pl-9 pr-16 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
 	/>
 	{#if $page.url.searchParams.get('search')}
 		<button
 			type="button"
 			onclick={handleClear}
-			class="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm text-muted-foreground hover:text-foreground"
+			class="absolute right-9 top-1/2 -translate-y-1/2 rounded-sm text-muted-foreground hover:text-foreground"
 		>
 			<X class="h-4 w-4" />
 		</button>
 	{/if}
+	<button
+		type="button"
+		onclick={handleSearch}
+		aria-label={m.common_search_button()}
+		class="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent flex items-center justify-center transition-colors"
+	>
+		<Search class="h-3.5 w-3.5" />
+	</button>
 </div>

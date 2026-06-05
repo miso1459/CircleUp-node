@@ -2,14 +2,17 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages';
 	import { Button } from '$lib/components/ui/button';
 
 	let {
 		currentPage,
-		totalPages
+		totalPages,
+		total
 	}: {
 		currentPage: number;
 		totalPages: number;
+		total: number;
 	} = $props();
 
 	const pageNumbers = $derived.by(() => {
@@ -41,7 +44,7 @@
 
 <div class="flex items-center justify-between">
 	<p class="text-xs text-muted-foreground">
-		{currentPage} / {totalPages} 페이지
+		{m.common_total_count({count: total})}
 	</p>
 	<div class="flex items-center gap-1">
 		<Button

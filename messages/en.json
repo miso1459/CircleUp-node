@@ -63,6 +63,14 @@
 	"common_loading": "Loading...",
 	"common_error": "An error occurred",
 
+	"common_search_placeholder": "Search",
+	"common_search_button": "Search",
+	"common_total_count": "Total {count} items",
+	"common_page_info": "Page {current} of {total}",
+	"common_search_result": "Search results for \"{search}\"",
+	"common_empty_result": "No results found",
+	"common_empty_hint": "Please try a different search term.",
+
 	"dropdown_language": "Language",
 	"dropdown_profile": "Profile",
 	"dropdown_logout": "Sign Out",

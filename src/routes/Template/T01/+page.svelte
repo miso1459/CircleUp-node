@@ -7,6 +7,7 @@
 	import Pagination from '$lib/components/Pagination.svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { Inbox, AlertCircle } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages';
 	import * as Table from '$lib/components/ui/table';
 
 	let { data } = $props();
@@ -60,17 +61,15 @@
 			Template 01
 		</h2>
 		<p class="mt-0.5 text-xs text-muted-foreground/70">
-			총 {data.total}건
 			{#if data.search}
-				<span class="text-muted-foreground/50">·</span>
-				"{data.search}" 검색 결과
+				{m.common_search_result({search: data.search})}
 			{/if}
 		</p>
 	</div>
 
 	<!-- Search area with subtle separator -->
 	<div class="shrink-0 border-b border-border/40 pb-4">
-		<SearchInput placeholder="코드 또는 설명 검색..." class="max-w-xs" />
+		<SearchInput class="max-w-sm" />
 	</div>
 
 	<!-- Table area: fills remaining viewport, scrolls internally -->
@@ -115,8 +114,8 @@
 				class="flex flex-col items-center justify-center rounded-2xl border border-border/50 bg-card py-16"
 			>
 				<Inbox class="mb-4 h-12 w-12 text-muted-foreground/50" strokeWidth={1.5} />
-				<p class="text-base font-medium text-foreground">검색 결과가 없습니다</p>
-				<p class="mt-1 text-sm text-muted-foreground">다른 검색어로 다시 시도해 주세요.</p>
+				<p class="text-base font-medium text-foreground">{m.common_empty_result()}</p>
+				<p class="mt-1 text-sm text-muted-foreground">{m.common_empty_hint()}</p>
 			</div>
 		{:else}
 			<!-- Normal data table -->
@@ -127,7 +126,7 @@
 	<!-- Pagination pinned at bottom -->
 	{#if !isEmpty && !isError && !isLoading}
 		<div class="shrink-0 border-t border-border/40 pt-3">
-			<Pagination currentPage={data.page} totalPages={data.totalPages} />
+			<Pagination currentPage={data.page} totalPages={data.totalPages} total={data.total} />
 		</div>
 	{/if}
 </div>

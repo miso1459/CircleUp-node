@@ -8,11 +8,10 @@ function makeItem(id: number, code: string, desc: string) {
 		id,
 		code,
 		desc,
-		date: Date.now(),
 		createdBy: null as string | null,
-		createdAt: Date.now(),
+		createdAt: new Date(),
 		updatedBy: null as string | null,
-		updatedAt: Date.now()
+		updatedAt: new Date()
 	};
 }
 
@@ -84,8 +83,7 @@ vi.mock('$lib/server/db', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Module under test — WILL FAIL to resolve in RED phase
-// because +page.server.ts does not exist yet.
+// Module under test
 // ---------------------------------------------------------------------------
 import { load } from './+page.server';
 
@@ -97,7 +95,7 @@ function mockUrl(searchParams: Record<string, string> = {}): URL {
 	return new URL(`http://localhost?${usp.toString()}`);
 }
 
-describe('Template T02 — +page.server.ts load', () => {
+describe('Template T01 — +page.server.ts load', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		mockItemsData = [...ALL_ITEMS];
@@ -105,7 +103,7 @@ describe('Template T02 — +page.server.ts load', () => {
 	});
 
 	// -----------------------------------------------------------------------
-	it('loads without query params: returns first page with default page=1', async () => {
+	it('loads without query params: returns all data, page=1, totalPages', async () => {
 		const result = await load({ url: mockUrl() } as any);
 
 		expect(result).toHaveProperty('items');
@@ -132,7 +130,7 @@ describe('Template T02 — +page.server.ts load', () => {
 	});
 
 	// -----------------------------------------------------------------------
-	it('loads with ?page=2: returns page 2 data with correct offset', async () => {
+	it('loads with ?page=2: returns page 2 data', async () => {
 		const result = await load({ url: mockUrl({ page: '2' }) } as any);
 
 		expect(result).toHaveProperty('items');
