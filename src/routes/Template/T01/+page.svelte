@@ -8,6 +8,7 @@
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { Inbox, AlertCircle } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages';
+	import { getLocale } from '$lib/paraglide/runtime';
 	import * as Table from '$lib/components/ui/table';
 
 	let { data } = $props();
@@ -15,6 +16,8 @@
 	const isLoading = $derived($navigating !== null);
 	const isEmpty = $derived(!isLoading && !data.error && data.items.length === 0);
 	const isError = $derived(!isLoading && !!data.error);
+
+	const currentLocale = $derived(getLocale());
 
 	const skeletonWidths = ['w-12', 'w-20', 'w-28', 'w-16', 'w-20', 'w-20'];
 
@@ -58,7 +61,7 @@
 	<!-- Title area -->
 	<div class="shrink-0 pt-0 pb-4">
 		<h2 class="text-base font-medium tracking-tight text-foreground">
-			Template 01
+			{currentLocale === 'en' ? data.titleEn : data.titleKo}
 		</h2>
 		<p class="mt-0.5 text-xs text-muted-foreground/70">
 			{#if data.search}
