@@ -52,14 +52,13 @@
 </script>
 
 <div class={cn('relative', className)}>
-	<Search class="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 	<input
 		bind:this={inputEl}
 		type="text"
 		value={$page.url.searchParams.get('search') ?? ''}
 		{placeholder}
 		onkeydown={handleKeydown}
-		class="h-8 w-full rounded-md border border-input bg-transparent pl-9 pr-16 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+		class="h-8 w-full rounded-md border border-input bg-transparent pl-3 pr-16 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
 	/>
 	{#if $page.url.searchParams.get('search')}
 		<button
