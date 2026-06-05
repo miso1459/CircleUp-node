@@ -7,9 +7,9 @@ test.describe('Template T01 Page', () => {
 		await page.waitForSelector('table tbody tr');
 		const rows = await page.locator('table tbody tr').count();
 		expect(rows).toBeGreaterThanOrEqual(1);
-		// Should show total count
-		const summary = await page.locator('text=/총 30건/').textContent();
-		expect(summary).toBeTruthy();
+		// Should show total count (now in Pagination component)
+		const summary = page.locator('text=/총 30건/');
+		await expect(summary).toBeVisible();
 	});
 
 	test('search T01-001 shows matching row', async ({ page }) => {
@@ -24,8 +24,8 @@ test.describe('Template T01 Page', () => {
 		const rows = await page.locator('table tbody tr').count();
 		expect(rows).toBeLessThanOrEqual(5);
 		// Should show search result text
-		const summary = await page.locator('text=/검색 결과/').textContent();
-		expect(summary).toBeTruthy();
+		const summary = page.locator('text=/검색 결과/');
+		await expect(summary).toBeVisible();
 	});
 
 	test('clear search shows all 30 rows', async ({ page }) => {
@@ -34,7 +34,7 @@ test.describe('Template T01 Page', () => {
 		// Clear button should exist
 		const clearBtn = page.locator('button:has(svg.lucide-x)');
 		await clearBtn.click();
-		await page.waitForURL(/search=/, { assert: URL => !URL.toString().includes('search=') });
+		await page.waitForURL('/Template/T01');
 		// Should show all 30 rows
 		const rows = await page.locator('table tbody tr').count();
 		expect(rows).toBeGreaterThanOrEqual(1);
@@ -70,6 +70,21 @@ test.describe('Template T01 Page', () => {
 		// Next button (ChevronRight) should be disabled
 		const nextBtn = page.locator('button[disabled]:has(svg.lucide-chevron-right)');
 		await expect(nextBtn).toBeVisible();
+	});
+
+	test('search button triggers search', async ({ page }) => {
+		await page.goto('/Template/T01');
+		await page.waitForSelector('table tbody tr');
+		// Type search text
+		await page.fill('input[type="text"]', 'T01-002');
+		// Click the search button (the button with Search icon)
+		const searchBtn = page.locator('button[aria-label="검색"]');
+		await searchBtn.click();
+		// Wait for URL to update
+		await page.waitForURL(/search=T01-002/);
+		// Should show fewer rows
+		const rows = await page.locator('table tbody tr').count();
+		expect(rows).toBeLessThanOrEqual(5);
 	});
 
 	test('layout fills screen without overflow', async ({ page }) => {
