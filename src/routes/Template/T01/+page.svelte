@@ -56,7 +56,7 @@
 
 <div class="flex h-full flex-col px-5 pb-5">
 	<!-- Title area -->
-	<div class="shrink-0 pt-5 pb-4">
+	<div class="shrink-0 pt-0 pb-4">
 		<h2 class="text-base font-medium tracking-tight text-foreground">
 			Template 01
 		</h2>
